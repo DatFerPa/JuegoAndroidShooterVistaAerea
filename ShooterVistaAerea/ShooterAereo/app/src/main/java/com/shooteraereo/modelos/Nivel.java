@@ -24,6 +24,14 @@ public class Nivel {
     private Tile[][] mapaTiles;
     private Jugador jugador;
 
+    //orinetaciones
+    //jugador
+    public double posicionJugadorX;
+    public double posicionJugadorY;
+    //disparos
+
+
+
     public boolean inicializado;
 
     public Nivel(Context context, int numeroNivel) throws Exception {
@@ -44,6 +52,7 @@ public class Nivel {
 
     public void actualizar (long tiempo){
         if (inicializado) {
+            jugador.procesarOrdenes(posicionJugadorX,posicionJugadorY);
             jugador.actualizar(tiempo);
         }
     }

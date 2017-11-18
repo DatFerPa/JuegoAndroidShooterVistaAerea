@@ -12,6 +12,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.shooteraereo.modelos.Nivel;
+import com.shooteraereo.modelos.controles.Pad;
 
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
@@ -19,6 +20,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     boolean iniciado = false;
     Context context;
     GameLoop gameloop;
+
+    //controles
+    private Pad pad;
 
     public static int pantallaAncho;
     public static int pantallaAlto;
@@ -86,11 +90,33 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     float y[] = new float[6];
 
     public void procesarEventosTouch() {
+        boolean pulsacionPadMover = false;
 
+        for(int i=0; i < 6; i++){
+            if(accion[i] != NO_ACTION ) {
+                if (pad.estaPulsado(x[i], y[i])) {
+
+                    float orientacionX = pad.getOrientacionX(x[i]);
+                    float orientacionY = pad.getOrientacionY(y[i]);
+
+                    // Si almenosuna pulsacion está en el pad
+                    if (accion[i] != ACTION_UP) {
+                        pulsacionPadMover = true;
+                        nivel.posicionJugadorX = orientacionX;
+                        nivel.posicionJugadorY = orientacionY;
+                    }
+                }
+            }
+        }
+        if(!pulsacionPadMover) {
+            nivel.posicionJugadorX = 0;
+            nivel.posicionJugadorY = 0;
+        }
     }
 
     protected void inicializar() throws Exception {
         nivel = new Nivel(context, numeroNivel);
+        pad = new Pad(context);
     }
 
     public void actualizar(long tiempo) throws Exception {
@@ -99,6 +125,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     protected void dibujar(Canvas canvas) {
         nivel.dibujar(canvas);
+        pad.dibujar(canvas);
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int width,

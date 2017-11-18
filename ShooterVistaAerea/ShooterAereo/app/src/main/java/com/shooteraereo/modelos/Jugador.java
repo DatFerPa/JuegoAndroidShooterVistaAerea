@@ -59,4 +59,6 @@ public class Jugador  extends Modelo{
     }
 
 
+    public void procesarOrdenes(double posicionJugadorX, double posicionJugadorY) {
+    }
 }
