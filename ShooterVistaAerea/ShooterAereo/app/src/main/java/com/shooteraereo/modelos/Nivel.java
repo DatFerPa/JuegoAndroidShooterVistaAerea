@@ -22,6 +22,7 @@ public class Nivel {
     private int numeroNivel;
     private Fondo fondo;
     private Tile[][] mapaTiles;
+    private Jugador jugador;
 
     public boolean inicializado;
 
@@ -43,7 +44,7 @@ public class Nivel {
 
     public void actualizar (long tiempo){
         if (inicializado) {
-
+            jugador.actualizar(tiempo);
         }
     }
 
@@ -52,6 +53,7 @@ public class Nivel {
         if(inicializado) {
             fondo.dibujar(canvas);
             dibujarTiles(canvas);
+            jugador.dibujar(canvas);
         }
     }
 
@@ -125,6 +127,14 @@ public class Nivel {
                 // bloque de musgo, no se puede pasar
                 return new Tile(CargadorGraficos.cargarDrawable(context,
                         R.drawable.piedra), Tile.SOLIDO);
+            case '1':
+                // Jugador
+                // Posicion centro abajo
+                int xCentroAbajoTile = x * Tile.ancho + Tile.ancho/2;
+                int yCentroAbajoTile = y * Tile.altura + Tile.altura;
+                jugador = new Jugador(context,xCentroAbajoTile,yCentroAbajoTile);
+
+                return new Tile(null, Tile.PASABLE);
             default:
                 //cualquier otro caso
                 return new Tile(null, Tile.PASABLE);
