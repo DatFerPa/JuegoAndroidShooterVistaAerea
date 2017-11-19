@@ -36,7 +36,6 @@ public class Nivel {
     //disparos
 
 
-
     public boolean inicializado;
 
     public Nivel(Context context, int numeroNivel) throws Exception {
@@ -49,25 +48,25 @@ public class Nivel {
         inicializado = true;
     }
 
-    public void inicializar()throws Exception {
+    public void inicializar() throws Exception {
         scrollEjeX = 0;
         scrollEjeY = 0;
-        fondo = new Fondo(context, CargadorGraficos.cargarBitmap(context,R.drawable.background),0);
+        fondo = new Fondo(context, CargadorGraficos.cargarBitmap(context, R.drawable.background), 0);
         inicializarMapaTiles();
     }
 
 
-    public void actualizar (long tiempo){
+    public void actualizar(long tiempo) {
         if (inicializado) {
-            jugador.procesarOrdenes(posicionJugadorX,posicionJugadorY);
+            jugador.procesarOrdenes(posicionJugadorX, posicionJugadorY);
             jugador.actualizar(tiempo);
             aplicarReglasMovimiento();
         }
     }
 
 
-    public void dibujar (Canvas canvas) {
-        if(inicializado) {
+    public void dibujar(Canvas canvas) {
+        if (inicializado) {
             fondo.dibujar(canvas);
             dibujarTiles(canvas);
             jugador.dibujar(canvas);
@@ -80,36 +79,36 @@ public class Nivel {
         // La matriz de tiles es más grande que la pantalla
         int tileXJugador = (int) jugador.x / Tile.ancho;
         int izquierda = (int) (tileXJugador - tilesEnDistanciaX(jugador.x - scrollEjeX));
-        izquierda = Math.max(0,izquierda); // Que nunca sea < 0, ej -1
+        izquierda = Math.max(0, izquierda); // Que nunca sea < 0, ej -1
 
         int tileYJugador = (int) jugador.y / Tile.altura;
         int abajo = (int) (tileYJugador - tilesEnDistanciaX(jugador.y - scrollEjeY));
-        abajo = Math.max(0,abajo);
+        abajo = Math.max(0, abajo);
 
-        if ( jugador .x  < anchoMapaTiles()* Tile.ancho - GameView.pantallaAncho*0.3 )
-            if( jugador .x - scrollEjeX > GameView.pantallaAncho * 0.7 ){
-                fondo.mover((int) (jugador .x - GameView.pantallaAncho* 0.7 - scrollEjeX));
-                scrollEjeX = (int) ((jugador .x ) - GameView.pantallaAncho* 0.7);
+        if (jugador.x < anchoMapaTiles() * Tile.ancho - GameView.pantallaAncho * 0.3)
+            if (jugador.x - scrollEjeX > GameView.pantallaAncho * 0.7) {
+                fondo.mover((int) (jugador.x - GameView.pantallaAncho * 0.7 - scrollEjeX));
+                scrollEjeX = (int) ((jugador.x) - GameView.pantallaAncho * 0.7);
 
             }
 
-        if(jugador.y < altoMapaTiles()*Tile.altura - GameView.pantallaAlto*0.3){
-            if(jugador.y - scrollEjeY > GameView.pantallaAlto * 0.7){
-                scrollEjeY = (int) ((jugador.y)-GameView.pantallaAlto*0.7);
-            }
-        }
-
-        if(jugador.y > GameView.pantallaAlto*0.3){
-            if(jugador.y - scrollEjeY < GameView.pantallaAlto * 0.3){
-                scrollEjeY = (int)(jugador.y - GameView.pantallaAlto * 0.3);
+        if (jugador.y < altoMapaTiles() * Tile.altura - GameView.pantallaAlto * 0.3) {
+            if (jugador.y - scrollEjeY > GameView.pantallaAlto * 0.7) {
+                scrollEjeY = (int) ((jugador.y) - GameView.pantallaAlto * 0.7);
             }
         }
 
+        if (jugador.y > GameView.pantallaAlto * 0.3) {
+            if (jugador.y - scrollEjeY < GameView.pantallaAlto * 0.3) {
+                scrollEjeY = (int) (jugador.y - GameView.pantallaAlto * 0.3);
+            }
+        }
 
-        if ( jugador .x  > GameView.pantallaAncho*0.3 )
-            if( jugador .x - scrollEjeX < GameView.pantallaAncho *0.3 ){
-                fondo.mover((int) (jugador .x - GameView.pantallaAncho* 0.3 - scrollEjeX));
-                scrollEjeX = (int)(jugador .x - GameView.pantallaAncho*0.3);
+
+        if (jugador.x > GameView.pantallaAncho * 0.3)
+            if (jugador.x - scrollEjeX < GameView.pantallaAncho * 0.3) {
+                fondo.mover((int) (jugador.x - GameView.pantallaAncho * 0.3 - scrollEjeX));
+                scrollEjeX = (int) (jugador.x - GameView.pantallaAncho * 0.3);
             }
 
 
@@ -120,7 +119,6 @@ public class Nivel {
         derecha = Math.min(derecha, anchoMapaTiles() - 1);
 
 
-
         for (int y = 0; y < altoMapaTiles(); y++) {
             for (int x = 0; x < anchoMapaTiles(); x++) {
                 if (mapaTiles[x][y].imagen != null) {
@@ -128,9 +126,9 @@ public class Nivel {
                     // izquierda, arriba, derecha , abajo
 
                     mapaTiles[x][y].imagen.setBounds(
-                            ( x * Tile.ancho) - scrollEjeX,
+                            (x * Tile.ancho) - scrollEjeX,
                             (y * Tile.altura) - scrollEjeY,
-                            ( x * Tile.ancho )+ Tile.ancho - scrollEjeX,
+                            (x * Tile.ancho) + Tile.ancho - scrollEjeX,
                             (y * Tile.altura) + Tile.altura - scrollEjeY);
 
                     mapaTiles[x][y].imagen.draw(canvas);
@@ -139,26 +137,26 @@ public class Nivel {
         }
     }
 
-    private float tilesEnDistanciaX(double distanciaX){
-        return (float) distanciaX/Tile.ancho;
+    private float tilesEnDistanciaX(double distanciaX) {
+        return (float) distanciaX / Tile.ancho;
     }
 
-    private float tilesEnDistanciaY(double distanciaY){
-        return (float) distanciaY/Tile.altura;
+    private float tilesEnDistanciaY(double distanciaY) {
+        return (float) distanciaY / Tile.altura;
     }
 
-    public int anchoMapaTiles(){
+    public int anchoMapaTiles() {
         return mapaTiles.length;
     }
 
-    public int altoMapaTiles(){
+    public int altoMapaTiles() {
 
         return mapaTiles[0].length;
     }
 
 
     private void inicializarMapaTiles() throws Exception {
-        InputStream is = context.getAssets().open(numeroNivel+".txt");
+        InputStream is = context.getAssets().open(numeroNivel + ".txt");
         int anchoLinea;
 
         List<String> lineas = new LinkedList<String>();
@@ -166,11 +164,9 @@ public class Nivel {
         {
             String linea = reader.readLine();
             anchoLinea = linea.length();
-            while (linea != null)
-            {
+            while (linea != null) {
                 lineas.add(linea);
-                if (linea.length() != anchoLinea)
-                {
+                if (linea.length() != anchoLinea) {
                     Log.e("ERROR", "Dimensiones incorrectas en la línea");
                     throw new Exception("Dimensiones incorrectas en la línea.");
                 }
@@ -184,12 +180,12 @@ public class Nivel {
         for (int y = 0; y < altoMapaTiles(); ++y) {
             for (int x = 0; x < anchoMapaTiles(); ++x) {
                 char tipoDeTile = lineas.get(y).charAt(x);//lines[y][x];
-                mapaTiles[x][y] = inicializarTile(tipoDeTile,x,y);
+                mapaTiles[x][y] = inicializarTile(tipoDeTile, x, y);
             }
         }
     }
 
-    private Tile inicializarTile(char codigoTile,int x, int y) {
+    private Tile inicializarTile(char codigoTile, int x, int y) {
         switch (codigoTile) {
             case '.':
                 // en blanco, sin textura
@@ -201,9 +197,9 @@ public class Nivel {
             case '1':
                 // Jugador
                 // Posicion centro abajo
-                int xCentroAbajoTile = x * Tile.ancho + Tile.ancho/2;
+                int xCentroAbajoTile = x * Tile.ancho + Tile.ancho / 2;
                 int yCentroAbajoTile = y * Tile.altura + Tile.altura;
-                jugador = new Jugador(context,xCentroAbajoTile,yCentroAbajoTile);
+                jugador = new Jugador(context, xCentroAbajoTile, yCentroAbajoTile);
 
                 return new Tile(null, Tile.PASABLE);
             default:
@@ -212,14 +208,14 @@ public class Nivel {
         }
     }
 
-    private void aplicarReglasMovimiento(){
+    private void aplicarReglasMovimiento() {
         int tileXJugadorIzquierda
                 = (int) (jugador.x - (jugador.ancho / 2 - 1)) / Tile.ancho;
         int tileXJugadorDerecha
-                = (int) (jugador.x + (jugador.ancho / 2 - 1 )) / Tile.ancho;
+                = (int) (jugador.x + (jugador.ancho / 2 - 1)) / Tile.ancho;
 
         int tileYJugadorInferior
-                = (int) (jugador.y + (jugador.altura / 2 - 1))/ Tile.altura;
+                = (int) (jugador.y + (jugador.altura / 2 - 1)) / Tile.altura;
         int tileYJugadorCentro
                 = (int) jugador.y / Tile.altura;
         int tileYJugadorSuperior
@@ -273,6 +269,7 @@ public class Nivel {
             }
         }
 
+
         // izquierda
         if (jugador.velocidadX <= 0) {
             // Tengo un tile detrás y es PASABLE
@@ -320,29 +317,54 @@ public class Nivel {
         }
 
 
+        // arriba
+        if(jugador.velocidadY <= 0){
+            if(tileYJugadorSuperior - 1 >= 0
+                    && mapaTiles[tileXJugadorIzquierda][tileYJugadorSuperior - 1].tipoDeColision == Tile.PASABLE
+                    &&mapaTiles[tileXJugadorDerecha][tileYJugadorSuperior - 1].tipoDeColision == Tile.PASABLE
+                    &&mapaTiles[tileXJugadorIzquierda][tileYJugadorSuperior].tipoDeColision == Tile.PASABLE
+                    &&mapaTiles[tileXJugadorDerecha][tileYJugadorSuperior].tipoDeColision == Tile.PASABLE) {
+
+                jugador.y += jugador.velocidadY;
+            }else if(tileYJugadorSuperior >= 0 &&
+                    mapaTiles[tileXJugadorIzquierda][tileYJugadorSuperior].tipoDeColision == Tile.PASABLE
+                    &&mapaTiles[tileXJugadorDerecha][tileYJugadorSuperior].tipoDeColision == Tile.PASABLE){
+                int tileJugadorBordeSuperior = tileYJugadorSuperior * Tile.altura;
+                double distanciaY = (jugador.y - jugador.altura / 2)-tileJugadorBordeSuperior;
+                if(distanciaY > 0){
+                    double velocidadNecesaria = Utilidades.proximoACero(-distanciaY,jugador.velocidadY);
+                    jugador.y += velocidadNecesaria;
+                }else{
+                    jugador.y = tileJugadorBordeSuperior + jugador.altura / 2;
+                }
+            }
+        }
+
+        //abajo
+        if(jugador.velocidadY > 0){
+            if(tileYJugadorInferior + 1 <= altoMapaTiles() - 1 &&
+                    mapaTiles[tileXJugadorIzquierda][tileYJugadorInferior + 1].tipoDeColision == Tile.PASABLE
+                    &&mapaTiles[tileXJugadorDerecha][tileYJugadorInferior + 1].tipoDeColision == Tile.PASABLE
+                    &&mapaTiles[tileXJugadorIzquierda][tileYJugadorInferior].tipoDeColision == Tile.PASABLE
+                    &&mapaTiles[tileXJugadorDerecha][tileYJugadorInferior].tipoDeColision == Tile.PASABLE){
+                jugador.y += jugador.velocidadY;
+            }else if(tileYJugadorInferior <= altoMapaTiles() - 1 &&
+                    mapaTiles[tileXJugadorIzquierda][tileYJugadorInferior].tipoDeColision == Tile.PASABLE
+                    &&mapaTiles[tileXJugadorDerecha][tileYJugadorInferior].tipoDeColision == Tile.PASABLE){
+                int tileJugadorBordeInferior = tileYJugadorInferior * Tile.altura + Tile.altura;
+                double distanciaY = tileJugadorBordeInferior - (jugador.y + jugador.altura / 2);
+                if(distanciaY > 0){
+                    double velocidadNecesaria = Math.min(distanciaY,jugador.velocidadY);
+                    jugador.y += velocidadNecesaria;
+                }else{
+                    jugador.y = tileJugadorBordeInferior - jugador.altura / 2;
+                }
+            }
+        }
 
 
         //fin reglas jugador
     }//fin aplicar reglas de movimiento
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }//fin clase nivel
