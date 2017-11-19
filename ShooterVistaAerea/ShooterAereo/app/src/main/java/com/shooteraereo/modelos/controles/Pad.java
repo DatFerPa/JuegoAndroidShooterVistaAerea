@@ -24,27 +24,15 @@ public class Pad extends Modelo {
     }
 
     public boolean estaPulsado(float clickX, float clickY) {
-        /*
-        boolean estaPulsado = false;
-
-        if (clickX <= (x + ancho / 2) && clickX >= (x - ancho / 2)
-                && clickY <= (y + altura / 2) && clickY >= (y - altura / 2)
-
-                ) {
-            estaPulsado = true;
-        }
-        return estaPulsado;
-        */
-
         boolean estaPulsado = false;
 
         //hacemos click dentro de la circunferencia
         double distancia = Math.sqrt(Math.pow(clickX - x, 2) + Math.pow(clickY - y, 2));
 
-        if(distancia < 35){
+        if(distancia < 50){
             estaPulsado = true;
         }
-        //System.out.println("pad movimineto Pulasdo: "+estaPulsado);
+        System.out.println("pad movimineto Pulasdo: "+estaPulsado);
         return estaPulsado;
     }
 
