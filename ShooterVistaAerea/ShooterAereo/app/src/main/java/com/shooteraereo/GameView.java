@@ -12,6 +12,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.shooteraereo.modelos.Nivel;
+import com.shooteraereo.modelos.controles.BotonDisparar;
 import com.shooteraereo.modelos.controles.Pad;
 
 
@@ -23,6 +24,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     //controles
     private Pad pad;
+    private BotonDisparar botonDisparar;
 
     public static int pantallaAncho;
     public static int pantallaAlto;
@@ -91,6 +93,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     public void procesarEventosTouch() {
         boolean pulsacionPadMover = false;
+        boolean pulsacionDisparo = false;
 
         for(int i=0; i < 6; i++){
             if(accion[i] != NO_ACTION ) {
@@ -106,17 +109,34 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                         nivel.posicionJugadorY = orientacionY;
                     }
                 }
+
+                if(botonDisparar.estaPulsado(x[i],y[i])){
+                    float orientacionX = botonDisparar.getOrientacionX(x[i]);
+                    float orientacionY = botonDisparar.getOrientacionY(y[i]);
+
+                    if (accion[i] != ACTION_DOWN) {
+                        nivel.disparando = true;
+                        nivel.posicionDisparoX = orientacionX;
+                        nivel.posicionDisparoY = orientacionY;
+                    }
+                }
             }
         }
         if(!pulsacionPadMover) {
             nivel.posicionJugadorX = 0;
             nivel.posicionJugadorY = 0;
         }
+
+
+
+
+
     }
 
     protected void inicializar() throws Exception {
         nivel = new Nivel(context, numeroNivel);
         pad = new Pad(context);
+        botonDisparar = new BotonDisparar(context);
     }
 
     public void actualizar(long tiempo) throws Exception {
@@ -126,6 +146,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     protected void dibujar(Canvas canvas) {
         nivel.dibujar(canvas);
         pad.dibujar(canvas);
+        botonDisparar.dibujar(canvas);
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int width,
