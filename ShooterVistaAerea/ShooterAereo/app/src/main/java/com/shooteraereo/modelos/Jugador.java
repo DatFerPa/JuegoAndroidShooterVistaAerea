@@ -24,8 +24,8 @@ public class Jugador  extends Modelo{
     public static final String DISPARANDO_DERECHA = "Disparando_derecha";
     public static final String DISPARANDO_IZQUIERDA = "Disparando_izquierda";
 
-    public static final int DISPARO_COLDOWN_MAXIMO = 20;
-    public static final int DISPARO_COLDOWN_BASE = 40;
+    public static final int DISPARO_COLDOWN_MAXIMO = 5;
+    public static final int DISPARO_COLDOWN_BASE = 20;
     int tiempoActual = DISPARO_COLDOWN_BASE;
     int tiempoParaDisparo = DISPARO_COLDOWN_BASE;
 
