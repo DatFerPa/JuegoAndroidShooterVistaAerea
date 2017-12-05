@@ -6,12 +6,12 @@ package com.shooteraereo;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.shooteraereo.modelos.Nivel;
+import com.shooteraereo.modelos.controles.BotonBomba;
 import com.shooteraereo.modelos.controles.BotonDisparar;
 import com.shooteraereo.modelos.controles.Pad;
 
@@ -25,6 +25,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     //controles
     private Pad pad;
     private BotonDisparar botonDisparar;
+    private BotonBomba botonBomba;
 
     public static int pantallaAncho;
     public static int pantallaAlto;
@@ -113,12 +114,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 if(botonDisparar.estaPulsado(x[i],y[i])){
                     float orientacionX = botonDisparar.getOrientacionX(x[i]);
                     float orientacionY = botonDisparar.getOrientacionY(y[i]);
-
-                    if (accion[i] != ACTION_DOWN) {
-                        nivel.disparando = true;
+                    System.out.println("nivel pulsado : " + nivel.botonDisparando);
+                    if (accion[i] != ACTION_UP) {
+                        nivel.botonDisparando = true;
+                        System.out.println("nivel pulsado : " + nivel.botonDisparando);
                         nivel.posicionDisparoX = orientacionX;
                         nivel.posicionDisparoY = orientacionY;
+                    }else{
+                        nivel.botonDisparando = false;
                     }
+
                 }
             }
         }
@@ -137,6 +142,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         nivel = new Nivel(context, numeroNivel);
         pad = new Pad(context);
         botonDisparar = new BotonDisparar(context);
+        botonBomba = new BotonBomba(context);
     }
 
     public void actualizar(long tiempo) throws Exception {
@@ -147,6 +153,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         nivel.dibujar(canvas);
         pad.dibujar(canvas);
         botonDisparar.dibujar(canvas);
+        botonBomba.dibujar(canvas);
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int width,

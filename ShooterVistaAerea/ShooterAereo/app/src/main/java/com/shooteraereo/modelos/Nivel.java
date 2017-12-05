@@ -37,7 +37,7 @@ public class Nivel {
     //disparos
     public float posicionDisparoX;
     public float posicionDisparoY;
-    public boolean disparando = false;
+    public boolean botonDisparando = false;
 
     //listas de modelos
     private List<DisparoJugador> disparosJugador;
@@ -67,18 +67,24 @@ public class Nivel {
     public void actualizar(long tiempo) {
         if (inicializado) {
             jugador.sumarTiempo();
-            boolean disparado = jugador.posibleDisparo();
-            jugador.procesarOrdenes(posicionJugadorX, posicionJugadorY, disparando);
 
+            jugador.procesarOrdenes(posicionJugadorX, posicionJugadorY, botonDisparando);
+            boolean disparado = jugador.posibleDisparo();
 
             for (DisparoJugador disparoJugador : disparosJugador) {
                 disparoJugador.actualizar(tiempo);
             }
 
-            if (disparando && disparado) {
+            if (botonDisparando && disparado) {
+                System.out.println("Comenzamos el disparo");
+                jugador.disparando = false;
+                jugador.ponerTiempoaCero();
+                botonDisparando = false;
                 disparosJugador.add(new DisparoJugador(context, jugador.x, jugador.y, posicionDisparoX, posicionDisparoY));
-                disparando = false;
+                System.out.println("Se ha disparado");
+
             }
+
             jugador.actualizar(tiempo);
             aplicarReglasMovimiento();
         }
@@ -216,9 +222,13 @@ public class Nivel {
                 // en blanco, sin textura
                 return new Tile(null, Tile.PASABLE);
             case '#':
-                // bloque de musgo, no se puede pasar
+                // bloque que nose puede pasar
                 return new Tile(CargadorGraficos.cargarDrawable(context,
                         R.drawable.piedra), Tile.SOLIDO);
+            case 'D':
+                return new Tile(CargadorGraficos.cargarDrawable(context,
+                        R.drawable.tierra),Tile.DESTRUCTIBLE);
+
             case '1':
                 // Jugador
                 // Posicion centro abajo

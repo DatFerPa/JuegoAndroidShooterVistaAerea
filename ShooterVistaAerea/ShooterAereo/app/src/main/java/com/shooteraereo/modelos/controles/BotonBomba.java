@@ -2,6 +2,9 @@ package com.shooteraereo.modelos.controles;
 
 import android.content.Context;
 
+import com.shooteraereo.GameView;
+import com.shooteraereo.R;
+import com.shooteraereo.gestores.CargadorGraficos;
 import com.shooteraereo.modelos.Modelo;
 
 /**
@@ -9,7 +12,16 @@ import com.shooteraereo.modelos.Modelo;
  */
 
 public class BotonBomba extends Modelo {
-    public BotonBomba(Context context, double x, double y, int altura, int ancho) {
-        super(context, x, y, altura, ancho);
+
+    public static int ANCHO_BOTON = 70;
+    public static int ALTO_BOTON = 70;
+
+    public BotonBomba(Context context) {
+        super(context, GameView.pantallaAncho*0.9 , GameView.pantallaAlto*0.65,
+                ANCHO_BOTON,ALTO_BOTON);
+
+        imagen = CargadorGraficos.cargarDrawable(context, R.drawable.botonbomba);
     }
+
+
 }

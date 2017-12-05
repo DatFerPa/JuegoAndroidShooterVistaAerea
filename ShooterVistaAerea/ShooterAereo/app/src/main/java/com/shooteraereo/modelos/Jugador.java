@@ -143,7 +143,9 @@ public class Jugador  extends Modelo{
         return (tiempoParaDisparo > tiempoActual)?true:false;
     }
 
-
+    public void ponerTiempoaCero(){
+        tiempoParaDisparo = 0;
+    }
 
     public void procesarOrdenes(float posicionJugadorX, float posicionJugadorY,boolean disparar) {
         float vecX = (posicionJugadorX) / (float) ((Math.sqrt(Math.pow((double) posicionJugadorX, 2) + Math.pow((double) posicionJugadorY, 2))));
@@ -157,9 +159,8 @@ public class Jugador  extends Modelo{
         velocidadX = posicionXCalculada * -1;
 
         //System.out.println("Velocidades : x: "+velocidadY+" - y: "+velocidadY);
-        if (disparar && tiempoParaDisparo > tiempoActual) {
-            disparando = false;
-            tiempoParaDisparo = 0;
+        if (disparar && posibleDisparo()) {
+            this.disparando = true;
             // preparar los sprites, no son bucles hay que reiniciarlos
             sprites.get(DISPARANDO_DERECHA).setFrameActual(0);
             sprites.get(DISPARANDO_IZQUIERDA).setFrameActual(0);

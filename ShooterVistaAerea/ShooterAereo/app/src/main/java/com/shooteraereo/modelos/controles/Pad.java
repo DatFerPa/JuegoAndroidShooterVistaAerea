@@ -32,7 +32,6 @@ public class Pad extends Modelo {
         if(distancia < 50){
             estaPulsado = true;
         }
-        System.out.println("pad movimineto Pulasdo: "+estaPulsado);
         return estaPulsado;
     }
 
