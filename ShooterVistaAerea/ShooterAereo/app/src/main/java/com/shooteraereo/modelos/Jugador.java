@@ -40,6 +40,7 @@ public class Jugador  extends Modelo{
 
 
 
+
     private Sprite sprite;
     private HashMap<String,Sprite> sprites = new HashMap<String,Sprite> ();
 
@@ -48,6 +49,7 @@ public class Jugador  extends Modelo{
 
     boolean disparando= false;
 
+    public static final int VIDA_MAX= 100;
     public int vida;
     public boolean golpeado = false;
 

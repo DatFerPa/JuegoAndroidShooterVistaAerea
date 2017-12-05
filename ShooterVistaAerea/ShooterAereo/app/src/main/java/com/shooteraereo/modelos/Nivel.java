@@ -413,6 +413,9 @@ public class Nivel {
             int tileXDisparoDerecha = (int) (disparoJugador.x + disparoJugador.cDerecha) / Tile.ancho;
             int tileXDisparoIzquierda = (int) (disparoJugador.x - disparoJugador.cIzquierda) / Tile.ancho;
 
+
+
+
             //derecha
             if (disparoJugador.velocidadX > 0) {
                 // Tiene delante un tile pasable, puede avanzar.
@@ -431,6 +434,16 @@ public class Nivel {
                                 Math.min(distanciaX, disparoJugador.velocidadX);
                         disparoJugador.x += velocidadNecesaria;
                     } else {
+                        if( mapaTiles[tileXDisparo + 1][tileYDisparoInferior].tipoDeColision == Tile.DESTRUCTIBLE){
+                            mapaTiles[tileXDisparo + 1][tileYDisparoInferior].tipoDeColision = Tile.PASABLE;
+                            mapaTiles[tileXDisparo + 1][tileYDisparoInferior].imagen = CargadorGraficos.cargarDrawable(context,
+                                    R.drawable.tile_transparente);
+                        }
+                        if(mapaTiles[tileXDisparo + 1][tileYDisparoSuperior].tipoDeColision == Tile.DESTRUCTIBLE){
+                            mapaTiles[tileXDisparo + 1][tileYDisparoSuperior].tipoDeColision = Tile.PASABLE;
+                            mapaTiles[tileXDisparo + 1][tileYDisparoSuperior].imagen = CargadorGraficos.cargarDrawable(context,
+                                    R.drawable.tile_transparente);
+                        }
                         iterator.remove();
                         continue;
                     }
@@ -454,6 +467,16 @@ public class Nivel {
                     double distanciaX =
                             (disparoJugador.x - disparoJugador.cIzquierda) - TileDisparoBordeIzquierdo;
                     if (distanciaX > 0) {
+                        if(mapaTiles[tileXDisparo - 1][tileYDisparoSuperior].tipoDeColision == Tile.DESTRUCTIBLE){
+                            mapaTiles[tileXDisparo - 1][tileYDisparoSuperior].tipoDeColision = Tile.PASABLE;
+                            mapaTiles[tileXDisparo - 1][tileYDisparoSuperior].imagen = CargadorGraficos.cargarDrawable(context,
+                                    R.drawable.tile_transparente);
+                        }
+                        if(mapaTiles[tileXDisparo - 1][tileYDisparoInferior].tipoDeColision == Tile.DESTRUCTIBLE){
+                            mapaTiles[tileXDisparo - 1][tileYDisparoInferior].tipoDeColision = Tile.PASABLE;
+                            mapaTiles[tileXDisparo - 1][tileYDisparoInferior].imagen = CargadorGraficos.cargarDrawable(context,
+                                    R.drawable.tile_transparente);
+                        }
                         double velocidadNecesaria =
                                 Utilidades.proximoACero(-distanciaX, disparoJugador.velocidadX);
                         disparoJugador.x += velocidadNecesaria;
@@ -476,6 +499,16 @@ public class Nivel {
                         double velocidadNecesaria = Utilidades.proximoACero(-distanciaY,disparoJugador.velocidadY);
                         disparoJugador.y += velocidadNecesaria;
                     }else{
+                        if(mapaTiles[tileXDisparoIzquierda][tileYDisparo - 1].tipoDeColision == Tile.DESTRUCTIBLE){
+                            mapaTiles[tileXDisparoIzquierda][tileYDisparo - 1].tipoDeColision = Tile.PASABLE;
+                            mapaTiles[tileXDisparoIzquierda][tileYDisparo - 1].imagen = CargadorGraficos.cargarDrawable(context,
+                                    R.drawable.tile_transparente);
+                        }
+                        if(mapaTiles[tileXDisparoDerecha][tileYDisparo - 1].tipoDeColision == Tile.DESTRUCTIBLE){
+                            mapaTiles[tileXDisparoDerecha][tileYDisparo - 1].tipoDeColision = Tile.PASABLE;
+                            mapaTiles[tileXDisparoDerecha][tileYDisparo - 1].imagen = CargadorGraficos.cargarDrawable(context,
+                                    R.drawable.tile_transparente);
+                        }
                         iterator.remove();
                         continue;
                     }
@@ -494,12 +527,24 @@ public class Nivel {
                         double velocidadNecesaria = Math.min(distanciaY,disparoJugador.velocidadY);
                         disparoJugador.y += velocidadNecesaria;
                     }else{
+                        if( mapaTiles[tileXDisparoDerecha][tileYDisparo + 1].tipoDeColision == Tile.DESTRUCTIBLE){
+                            mapaTiles[tileXDisparoDerecha][tileYDisparo + 1].tipoDeColision = Tile.PASABLE;
+                            mapaTiles[tileXDisparoDerecha][tileYDisparo + 1].imagen = CargadorGraficos.cargarDrawable(context,
+                                    R.drawable.tile_transparente);
+                        }
+                        if(mapaTiles[tileXDisparoIzquierda][tileYDisparo + 1].tipoDeColision == Tile.DESTRUCTIBLE){
+                            mapaTiles[tileXDisparoIzquierda][tileYDisparo + 1].tipoDeColision = Tile.PASABLE;
+                            mapaTiles[tileXDisparoIzquierda][tileYDisparo + 1].imagen = CargadorGraficos.cargarDrawable(context,
+                                    R.drawable.tile_transparente);
+                        }
                         iterator.remove();
                         continue;
                     }
 
                 }
             }
+
+
 
         }
         //fin reglas disparos jugador
