@@ -26,20 +26,18 @@ public class Jugador  extends Modelo{
 
     public static final int DISPARO_COLDOWN_MAXIMO = 5;
     public static final int DISPARO_COLDOWN_BASE = 20;
-    int tiempoActual = DISPARO_COLDOWN_BASE;
-    int tiempoParaDisparo = DISPARO_COLDOWN_BASE;
 
 
+    int tiempoActual;
+    int tiempoParaDisparo;
 
-    public static double VELOCIDAD_BASE = 5;
-
-    double velocidadX;
-    double velocidadY;
+    public static final int DAÑO_MAXIMO = 30;
+    public static final int DAÑO_BASE = 5;
+    int dañoAtaque;
 
     public static float VELOCIDAD = 5;
-
-
-
+    double velocidadX;
+    double velocidadY;
 
     private Sprite sprite;
     private HashMap<String,Sprite> sprites = new HashMap<String,Sprite> ();
@@ -62,6 +60,11 @@ public class Jugador  extends Modelo{
 
         this.x =  this.xInicial;
         this.y =  this.yInicial;
+
+        tiempoActual = DISPARO_COLDOWN_BASE;
+        this.vida = VIDA_MAX;
+        tiempoParaDisparo = DISPARO_COLDOWN_BASE;
+        this.dañoAtaque = DAÑO_BASE;
 
         inicializar();
     }
@@ -127,6 +130,32 @@ public class Jugador  extends Modelo{
             }else if(velocidadX >= 0){
                 sprite = sprites.get(DISPARANDO_DERECHA);
             }
+        }
+    }
+
+    public void restarVida(int valor){
+        this.vida -= valor;
+    }
+
+    public void sumarVida(int valor){
+        this.vida += valor;
+        if(this.vida >VIDA_MAX){
+            this.vida = VIDA_MAX;
+        }
+    }
+
+
+    public void reducirCoolDown(int valor){
+        this.tiempoParaDisparo -= valor;
+        if(tiempoParaDisparo <DISPARO_COLDOWN_MAXIMO ){
+            tiempoParaDisparo = DISPARO_COLDOWN_MAXIMO;
+        }
+    }
+
+    public void aumentarDaño(int valor){
+        dañoAtaque += valor;
+        if(dañoAtaque > DAÑO_MAXIMO){
+            dañoAtaque = DAÑO_MAXIMO;
         }
     }
 

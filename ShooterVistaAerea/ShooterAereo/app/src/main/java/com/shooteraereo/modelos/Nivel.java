@@ -27,6 +27,8 @@ public class Nivel {
     private Tile[][] mapaTiles;
     private Jugador jugador;
 
+
+
     public static int scrollEjeX = 0;
     public static int scrollEjeY = 0;
 
@@ -41,7 +43,7 @@ public class Nivel {
 
     //listas de modelos
     private List<DisparoJugador> disparosJugador;
-
+    private List<PowerUp> powerUps;
 
     public boolean inicializado;
 
@@ -60,6 +62,7 @@ public class Nivel {
         scrollEjeY = 0;
         fondo = new Fondo(context, CargadorGraficos.cargarBitmap(context, R.drawable.background), 0);
         disparosJugador = new LinkedList<DisparoJugador>();
+        powerUps = new LinkedList<PowerUp>();
         inicializarMapaTiles();
     }
 
@@ -99,6 +102,10 @@ public class Nivel {
 
             for (DisparoJugador disparoJugador : disparosJugador) {
                 disparoJugador.dibujar(canvas);
+            }
+
+            for(PowerUp powerUp: powerUps){
+                powerUp.dibujar(canvas);
             }
 
         }
@@ -237,6 +244,29 @@ public class Nivel {
                 jugador = new Jugador(context, xCentroAbajoTile, yCentroAbajoTile);
 
                 return new Tile(null, Tile.PASABLE);
+
+            case 'P':
+                int xCentroAbajoTileP = x * Tile.ancho + Tile.ancho / 2;
+                int yCentroAbajoTileP = y * Tile.altura + Tile.altura;
+                powerUps.add(new PowerUpDisparoPoder(context,xCentroAbajoTileP,yCentroAbajoTileP));
+
+                return new Tile(null, Tile.PASABLE);
+
+            case 'C':
+                int xCentroAbajoTileC = x * Tile.ancho + Tile.ancho / 2;
+                int yCentroAbajoTileC = y * Tile.altura + Tile.altura;
+                powerUps.add(new PowerUpDisparoCadencia(context,xCentroAbajoTileC,yCentroAbajoTileC));
+
+                return new Tile(null, Tile.PASABLE);
+
+            case 'V':
+                int xCentroAbajoTileV = x * Tile.ancho + Tile.ancho / 2;
+                int yCentroAbajoTileV = y * Tile.altura + Tile.altura;
+                powerUps.add(new PowerUpVida(context,xCentroAbajoTileV,yCentroAbajoTileV));
+
+                return new Tile(null, Tile.PASABLE);
+
+
             default:
                 //cualquier otro caso
                 return new Tile(null, Tile.PASABLE);
@@ -396,7 +426,7 @@ public class Nivel {
                 }
             }
         }
-//fin reglas jugador
+        //fin reglas jugador
 
         for (Iterator<DisparoJugador> iterator = disparosJugador.iterator(); iterator.hasNext(); ) {
             DisparoJugador disparoJugador = iterator.next();
@@ -467,6 +497,11 @@ public class Nivel {
                     double distanciaX =
                             (disparoJugador.x - disparoJugador.cIzquierda) - TileDisparoBordeIzquierdo;
                     if (distanciaX > 0) {
+
+                        double velocidadNecesaria =
+                                Utilidades.proximoACero(-distanciaX, disparoJugador.velocidadX);
+                        disparoJugador.x += velocidadNecesaria;
+                    } else {
                         if(mapaTiles[tileXDisparo - 1][tileYDisparoSuperior].tipoDeColision == Tile.DESTRUCTIBLE){
                             mapaTiles[tileXDisparo - 1][tileYDisparoSuperior].tipoDeColision = Tile.PASABLE;
                             mapaTiles[tileXDisparo - 1][tileYDisparoSuperior].imagen = CargadorGraficos.cargarDrawable(context,
@@ -477,10 +512,6 @@ public class Nivel {
                             mapaTiles[tileXDisparo - 1][tileYDisparoInferior].imagen = CargadorGraficos.cargarDrawable(context,
                                     R.drawable.tile_transparente);
                         }
-                        double velocidadNecesaria =
-                                Utilidades.proximoACero(-distanciaX, disparoJugador.velocidadX);
-                        disparoJugador.x += velocidadNecesaria;
-                    } else {
                         iterator.remove();
                         continue;
                     }
@@ -543,12 +574,16 @@ public class Nivel {
 
                 }
             }
+        }//fin reglas disparos jugador
 
-
-
+        for(Iterator<PowerUp> iterator = powerUps.iterator();iterator.hasNext();){
+            PowerUp powerUp = iterator.next();
+            if(powerUp.colisiona(jugador)){
+                powerUp.accion(jugador);
+                iterator.remove();
+                continue;
+            }
         }
-        //fin reglas disparos jugador
-
 
     }//fin aplicar reglas de movimiento
 
