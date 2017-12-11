@@ -11,6 +11,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.shooteraereo.modelos.Nivel;
+import com.shooteraereo.modelos.controles.BarraVida;
 import com.shooteraereo.modelos.controles.BotonBomba;
 import com.shooteraereo.modelos.controles.BotonDisparar;
 import com.shooteraereo.modelos.controles.Pad;
@@ -22,10 +23,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     Context context;
     GameLoop gameloop;
 
+
     //controles
     private Pad pad;
     private BotonDisparar botonDisparar;
     private BotonBomba botonBomba;
+    private BarraVida barraVida;;
 
     public static int pantallaAncho;
     public static int pantallaAlto;
@@ -143,6 +146,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         pad = new Pad(context);
         botonDisparar = new BotonDisparar(context);
         botonBomba = new BotonBomba(context);
+        barraVida = new BarraVida(context);
     }
 
     public void actualizar(long tiempo) throws Exception {
@@ -154,6 +158,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         pad.dibujar(canvas);
         botonDisparar.dibujar(canvas);
         botonBomba.dibujar(canvas);
+        barraVida.dibujarEnPantalla(canvas);
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int width,

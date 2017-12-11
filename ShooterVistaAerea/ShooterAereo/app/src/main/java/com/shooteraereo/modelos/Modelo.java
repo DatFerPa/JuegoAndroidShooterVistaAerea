@@ -48,6 +48,17 @@ public class Modelo {
         imagen.draw(canvas);
     }
 
+
+    public void dibujarEnPantalla(Canvas canvas){
+        int yArriba = (int)  y - altura / 2;
+        int xIzquierda = (int) x - ancho / 2;
+
+        imagen.setBounds(xIzquierda, yArriba, xIzquierda
+                + ancho, yArriba + altura);
+        imagen.draw(canvas);
+    }
+
+
     // No Actualiza
     public void actualizar(long tiempo) {
 
