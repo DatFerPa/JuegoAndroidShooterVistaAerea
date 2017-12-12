@@ -28,6 +28,10 @@ public class BarraVida extends Modelo {
         this.valorMaximo = valorMaximo;
     }
 
+    public void modificarValorVida(int vidaActual){
+        this.valorActual = vidaActual;
+    }
+
     @Override
     public void dibujarEnPantalla(Canvas canvas){
         Paint linea = new Paint();

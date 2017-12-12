@@ -35,7 +35,7 @@ public class Jugador  extends Modelo{
     public static final int DAÑO_BASE = 5;
     int dañoAtaque;
 
-    public static float VELOCIDAD = 5;
+    public static float VELOCIDAD = 3;
     double velocidadX;
     double velocidadY;
 

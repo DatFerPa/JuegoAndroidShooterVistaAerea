@@ -159,6 +159,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     public void actualizar(long tiempo) throws Exception {
         nivel.actualizar(tiempo);
+        barraVida.modificarValorVida(nivel.jugador.vida);
     }
 
     protected void dibujar(Canvas canvas) {

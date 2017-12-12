@@ -25,8 +25,7 @@ public class Nivel {
     private int numeroNivel;
     private Fondo fondo;
     private Tile[][] mapaTiles;
-    private Jugador jugador;
-
+    public Jugador jugador;
 
 
     public static int scrollEjeX = 0;
@@ -46,6 +45,8 @@ public class Nivel {
     private List<DisparoJugador> disparosJugador;
     private List<PowerUp> powerUps;
     private List<Bomba> bombas;//solo se va a premitir una
+    private List<EnemigoDisparador> enemigosDisparadores;
+    private List<DisparoEnemigo> disparosEnemigo;
 
     public boolean inicializado;
 
@@ -68,6 +69,8 @@ public class Nivel {
         disparosJugador = new LinkedList<DisparoJugador>();
         bombas = new LinkedList<Bomba>();
         powerUps = new LinkedList<PowerUp>();
+        enemigosDisparadores = new LinkedList<EnemigoDisparador>();
+        disparosEnemigo = new LinkedList<DisparoEnemigo>();
         inicializarMapaTiles();
     }
 
@@ -85,6 +88,25 @@ public class Nivel {
 
             for (DisparoJugador disparoJugador : disparosJugador) {
                 disparoJugador.actualizar(tiempo);
+            }
+
+            for(DisparoEnemigo disparo: disparosEnemigo){
+                disparo.actualizar(tiempo);
+            }
+
+            for(EnemigoDisparador enemigo : enemigosDisparadores){
+                enemigo.jugadorEnRadioYDisparoPosible(jugador.x,jugador.y);
+                if(enemigo.seHaDisparado){
+                    //generamos el disparo
+                    enemigo.seHaDisparado = false;
+                    System.out.println("Jugador : "+(float)jugador.x +"  -  "+(float)jugador.y);
+                    disparosEnemigo.add(new DisparoEnemigo(context,enemigo.x,enemigo.y,(float)jugador.x,(float)jugador.y));
+                    System.out.println("Enemigo disparando al jugador");
+                }
+                enemigo.actualizarTiempoParaMoverse();
+                enemigo.actualizarTiempoDisparo();
+                enemigo.actualizar(tiempo);
+
             }
 
             if(botonBombaPulsado && jugador.isbombaUsada()== false){
@@ -116,6 +138,14 @@ public class Nivel {
 
             for(Bomba bomba:bombas){
                 bomba.dibujar(canvas);
+            }
+
+            for(EnemigoDisparador enemigo : enemigosDisparadores){
+                enemigo.dibujar(canvas);
+            }
+
+            for(DisparoEnemigo disparo: disparosEnemigo){
+                disparo.dibujar(canvas);
             }
 
 
@@ -284,8 +314,12 @@ public class Nivel {
                 powerUps.add(new PowerUpVida(context,xCentroAbajoTileV,yCentroAbajoTileV));
 
                 return new Tile(null, Tile.PASABLE);
+            case 'Z':
+                int xCentroAbajoTileZ = x * Tile.ancho + Tile.ancho /2;
+                int yCentroAbajoTileZ = y * Tile.altura + Tile.altura /2;
+                enemigosDisparadores.add(new EnemigoDisparador(context,xCentroAbajoTileZ,yCentroAbajoTileZ));
 
-
+                return new Tile(null, Tile.PASABLE);
             default:
                 //cualquier otro caso
                 return new Tile(null, Tile.PASABLE);
@@ -459,6 +493,316 @@ public class Nivel {
             }
         }
         //fin reglas jugador
+
+
+        for (Iterator<EnemigoDisparador> iterator = enemigosDisparadores.iterator(); iterator.hasNext(); ) {
+            EnemigoDisparador enemigo = iterator.next();
+
+
+
+
+
+            int tileXEnemigoIzquierda
+                    = (int) (enemigo.x - (enemigo.ancho / 2 - 1)) / Tile.ancho;
+            int tileXEnemigoDerecha
+                    = (int) (enemigo.x + (enemigo.ancho / 2 - 1)) / Tile.ancho;
+
+            int tileYEnemigoInferior
+                    = (int) (enemigo.y + (enemigo.altura / 2 - 1)) / Tile.altura;
+            int tileYEnemigoCentro
+                    = (int) enemigo.y / Tile.altura;
+            int tileYEnemigoSuperior
+                    = (int) (enemigo.y - (enemigo.altura / 2 - 1)) / Tile.altura;
+
+            //reglas jugador
+            // derecha o parado
+            if (enemigo.velocidadX > 0) {
+                // Tengo un tile delante y es PASABLE
+                // El tile de delante está dentro del Nivel
+                if (tileXEnemigoDerecha + 1 <= anchoMapaTiles() - 1 &&
+                        tileYEnemigoInferior <= altoMapaTiles() - 1 &&
+                        mapaTiles[tileXEnemigoDerecha + 1][tileYEnemigoInferior].tipoDeColision ==
+                                Tile.PASABLE &&
+                        mapaTiles[tileXEnemigoDerecha + 1][tileYEnemigoCentro].tipoDeColision ==
+                                Tile.PASABLE &&
+                        mapaTiles[tileXEnemigoDerecha + 1][tileYEnemigoSuperior].tipoDeColision ==
+                                Tile.PASABLE &&
+                        mapaTiles[tileXEnemigoDerecha][tileYEnemigoInferior].tipoDeColision ==
+                                Tile.PASABLE &&
+                        mapaTiles[tileXEnemigoDerecha][tileYEnemigoCentro].tipoDeColision ==
+                                Tile.PASABLE &&
+                        mapaTiles[tileXEnemigoDerecha][tileYEnemigoSuperior].tipoDeColision ==
+                                Tile.PASABLE) {
+
+                    enemigo.x += enemigo.velocidadX;
+
+                    // No tengo un tile PASABLE delante
+                    // o es el FINAL del nivel o es uno SOLIDO
+                } else if (tileXEnemigoDerecha <= anchoMapaTiles() - 1 &&
+                        tileYEnemigoInferior <= altoMapaTiles() - 1 &&
+                        mapaTiles[tileXEnemigoDerecha][tileYEnemigoInferior].tipoDeColision ==
+                                Tile.PASABLE &&
+                        mapaTiles[tileXEnemigoDerecha][tileYEnemigoCentro].tipoDeColision ==
+                                Tile.PASABLE &&
+                        mapaTiles[tileXEnemigoDerecha][tileYEnemigoSuperior].tipoDeColision ==
+                                Tile.PASABLE) {
+
+                    // Si en el propio tile del jugador queda espacio para
+                    // avanzar más, avanzo
+                    int TileJugadorBordeDerecho = tileXEnemigoDerecha * Tile.ancho + Tile.ancho;
+                    double distanciaX = TileJugadorBordeDerecho - (enemigo.x + enemigo.ancho / 2);
+
+                    if (distanciaX > 0) {
+                        double velocidadNecesaria = Math.min(distanciaX, enemigo.velocidadX);
+                        enemigo.x += velocidadNecesaria;
+                    } else {
+                        // Opcional, corregir posición
+                        enemigo.x = TileJugadorBordeDerecho - enemigo.ancho / 2;
+                    }
+                }
+            }
+
+
+            // izquierda
+            if (enemigo.velocidadX <= 0) {
+                // Tengo un tile detrás y es PASABLE
+                // El tile de delante está dentro del Nivel
+                if (tileXEnemigoIzquierda - 1 >= 0 &&
+                        tileYEnemigoInferior < altoMapaTiles() - 1 &&
+                        mapaTiles[tileXEnemigoIzquierda - 1][tileYEnemigoInferior].tipoDeColision ==
+                                Tile.PASABLE &&
+                        mapaTiles[tileXEnemigoIzquierda - 1][tileYEnemigoCentro].tipoDeColision ==
+                                Tile.PASABLE &&
+                        mapaTiles[tileXEnemigoIzquierda - 1][tileYEnemigoSuperior].tipoDeColision ==
+                                Tile.PASABLE &&
+                        mapaTiles[tileXEnemigoIzquierda][tileYEnemigoInferior].tipoDeColision ==
+                                Tile.PASABLE &&
+                        mapaTiles[tileXEnemigoIzquierda][tileYEnemigoCentro].tipoDeColision ==
+                                Tile.PASABLE &&
+                        mapaTiles[tileXEnemigoIzquierda][tileYEnemigoSuperior].tipoDeColision ==
+                                Tile.PASABLE) {
+
+                    enemigo.x += enemigo.velocidadX;
+
+                    // No tengo un tile PASABLE detrás
+                    // o es el INICIO del nivel o es uno SOLIDO
+                } else if (tileXEnemigoIzquierda >= 0 && tileYEnemigoInferior <= altoMapaTiles() - 1 &&
+                        mapaTiles[tileXEnemigoIzquierda][tileYEnemigoInferior].tipoDeColision
+                                == Tile.PASABLE &&
+                        mapaTiles[tileXEnemigoIzquierda][tileYEnemigoCentro].tipoDeColision
+                                == Tile.PASABLE &&
+                        mapaTiles[tileXEnemigoIzquierda][tileYEnemigoSuperior].tipoDeColision
+                                == Tile.PASABLE) {
+
+                    // Si en el propio tile del jugador queda espacio para
+                    // avanzar más, avanzo
+                    int TileJugadorBordeIzquierdo = tileXEnemigoIzquierda * Tile.ancho;
+                    double distanciaX = (enemigo.x - enemigo.ancho / 2) - TileJugadorBordeIzquierdo;
+
+                    if (distanciaX > 0) {
+                        double velocidadNecesaria = Utilidades.proximoACero(-distanciaX, enemigo.velocidadX);
+                        enemigo.x += velocidadNecesaria;
+                    } else {
+                        // Opcional, corregir posición
+                        enemigo.x = TileJugadorBordeIzquierdo + enemigo.ancho / 2;
+                    }
+                }
+            }
+
+
+            // arriba
+            if (enemigo.velocidadY <= 0) {
+                if (tileYEnemigoSuperior - 1 >= 0
+                        && mapaTiles[tileXEnemigoIzquierda][tileYEnemigoSuperior - 1].tipoDeColision == Tile.PASABLE
+                        && mapaTiles[tileXEnemigoDerecha][tileYEnemigoSuperior - 1].tipoDeColision == Tile.PASABLE
+                        && mapaTiles[tileXEnemigoIzquierda][tileYEnemigoSuperior].tipoDeColision == Tile.PASABLE
+                        && mapaTiles[tileXEnemigoDerecha][tileYEnemigoSuperior].tipoDeColision == Tile.PASABLE) {
+
+                    enemigo.y += enemigo.velocidadY;
+                } else if (tileYEnemigoSuperior >= 0 &&
+                        mapaTiles[tileXEnemigoIzquierda][tileYEnemigoSuperior].tipoDeColision == Tile.PASABLE
+                        && mapaTiles[tileXEnemigoDerecha][tileYEnemigoSuperior].tipoDeColision == Tile.PASABLE) {
+                    int tileJugadorBordeSuperior = tileYEnemigoSuperior * Tile.altura;
+                    double distanciaY = (enemigo.y - enemigo.altura / 2) - tileJugadorBordeSuperior;
+                    if (distanciaY > 0) {
+                        double velocidadNecesaria = Utilidades.proximoACero(-distanciaY, enemigo.velocidadY);
+                        enemigo.y += velocidadNecesaria;
+                    } else {
+                        enemigo.y = tileJugadorBordeSuperior + enemigo.altura / 2;
+                    }
+                }
+            }
+
+            //abajo
+            if (enemigo.velocidadY > 0) {
+                if (tileYEnemigoInferior + 1 <= altoMapaTiles() - 1 &&
+                        mapaTiles[tileXEnemigoIzquierda][tileYEnemigoInferior + 1].tipoDeColision == Tile.PASABLE
+                        && mapaTiles[tileXEnemigoDerecha][tileYEnemigoInferior + 1].tipoDeColision == Tile.PASABLE
+                        && mapaTiles[tileXEnemigoIzquierda][tileYEnemigoInferior].tipoDeColision == Tile.PASABLE
+                        && mapaTiles[tileXEnemigoDerecha][tileYEnemigoInferior].tipoDeColision == Tile.PASABLE) {
+                    enemigo.y += enemigo.velocidadY;
+                } else if (tileYEnemigoInferior <= altoMapaTiles() - 1 &&
+                        mapaTiles[tileXEnemigoIzquierda][tileYEnemigoInferior].tipoDeColision == Tile.PASABLE
+                        && mapaTiles[tileXEnemigoDerecha][tileYEnemigoInferior].tipoDeColision == Tile.PASABLE) {
+                    int tileJugadorBordeInferior = tileYEnemigoInferior * Tile.altura + Tile.altura;
+                    double distanciaY = tileJugadorBordeInferior - (enemigo.y + enemigo.altura / 2);
+                    if (distanciaY > 0) {
+                        double velocidadNecesaria = Math.min(distanciaY, enemigo.velocidadY);
+                        enemigo.y += velocidadNecesaria;
+                    } else {
+                        enemigo.y = tileJugadorBordeInferior - enemigo.altura / 2;
+                    }
+                }
+            }
+        }
+
+        for(Iterator<DisparoEnemigo> iterator = disparosEnemigo.iterator(); iterator.hasNext();){
+            DisparoEnemigo disparoEnemigo = iterator.next();
+            int tileXDisparo = (int) disparoEnemigo.x / Tile.ancho;
+            int tileYDisparoInferior =
+                    (int) (disparoEnemigo.y + disparoEnemigo.cAbajo) / Tile.altura;
+            int tileYDisparoSuperior =
+                    (int) (disparoEnemigo.y - disparoEnemigo.cArriba) / Tile.altura;
+
+            //variables para colisiones en Y
+            int tileYDisparo = (int) disparoEnemigo.y / Tile.altura;
+            int tileXDisparoDerecha = (int) (disparoEnemigo.x + disparoEnemigo.cDerecha) / Tile.ancho;
+            int tileXDisparoIzquierda = (int) (disparoEnemigo.x - disparoEnemigo.cIzquierda) / Tile.ancho;
+
+
+
+            //derecha
+            if (disparoEnemigo.velocidadX > 0) {
+                // Tiene delante un tile pasable, puede avanzar.
+                if (tileXDisparo + 1 <= anchoMapaTiles() - 1 &&
+                        mapaTiles[tileXDisparo + 1][tileYDisparoInferior].tipoDeColision
+                                == Tile.PASABLE &&
+                        mapaTiles[tileXDisparo + 1][tileYDisparoSuperior].tipoDeColision
+                                == Tile.PASABLE) {
+                    disparoEnemigo.x += disparoEnemigo.velocidadX;
+                } else if (tileXDisparo <= anchoMapaTiles() - 1) {
+                    int TileDisparoBordeDerecho = tileXDisparo * Tile.ancho + Tile.ancho;
+                    double distanciaX =
+                            TileDisparoBordeDerecho - (disparoEnemigo.x + disparoEnemigo.cDerecha);
+                    if (distanciaX > 0) {
+                        double velocidadNecesaria =
+                                Math.min(distanciaX, disparoEnemigo.velocidadX);
+                        disparoEnemigo.x += velocidadNecesaria;
+                    } else {
+                        if( mapaTiles[tileXDisparo + 1][tileYDisparoInferior].tipoDeColision == Tile.DESTRUCTIBLE){
+                            mapaTiles[tileXDisparo + 1][tileYDisparoInferior].tipoDeColision = Tile.PASABLE;
+                            mapaTiles[tileXDisparo + 1][tileYDisparoInferior].imagen = CargadorGraficos.cargarDrawable(context,
+                                    R.drawable.tile_transparente);
+                        }
+                        if(mapaTiles[tileXDisparo + 1][tileYDisparoSuperior].tipoDeColision == Tile.DESTRUCTIBLE){
+                            mapaTiles[tileXDisparo + 1][tileYDisparoSuperior].tipoDeColision = Tile.PASABLE;
+                            mapaTiles[tileXDisparo + 1][tileYDisparoSuperior].imagen = CargadorGraficos.cargarDrawable(context,
+                                    R.drawable.tile_transparente);
+                        }
+                        iterator.remove();
+                        continue;
+                    }
+                }
+            }
+            // izquierda
+            if (disparoEnemigo.velocidadX <= 0) {
+                if (tileXDisparo - 1 >= 0 &&
+                        tileYDisparoSuperior < altoMapaTiles() - 1 &&
+                        mapaTiles[tileXDisparo - 1][tileYDisparoSuperior].tipoDeColision ==
+                                Tile.PASABLE &&
+                        mapaTiles[tileXDisparo - 1][tileYDisparoInferior].tipoDeColision ==
+                                Tile.PASABLE) {
+                    disparoEnemigo.x += disparoEnemigo.velocidadX;
+                    // No tengo un tile PASABLE detras
+                    // o es el INICIO del nivel o es uno SOLIDO
+                } else if (tileXDisparo >= 0) {
+                    // Si en el propio tile del jugador queda espacio para
+                    // avanzar más, avanzo
+                    int TileDisparoBordeIzquierdo = tileXDisparo * Tile.ancho;
+                    double distanciaX =
+                            (disparoEnemigo.x - disparoEnemigo.cIzquierda) - TileDisparoBordeIzquierdo;
+                    if (distanciaX > 0) {
+
+                        double velocidadNecesaria =
+                                Utilidades.proximoACero(-distanciaX, disparoEnemigo.velocidadX);
+                        disparoEnemigo.x += velocidadNecesaria;
+                    } else {
+                        if(mapaTiles[tileXDisparo - 1][tileYDisparoSuperior].tipoDeColision == Tile.DESTRUCTIBLE){
+                            mapaTiles[tileXDisparo - 1][tileYDisparoSuperior].tipoDeColision = Tile.PASABLE;
+                            mapaTiles[tileXDisparo - 1][tileYDisparoSuperior].imagen = CargadorGraficos.cargarDrawable(context,
+                                    R.drawable.tile_transparente);
+                        }
+                        if(mapaTiles[tileXDisparo - 1][tileYDisparoInferior].tipoDeColision == Tile.DESTRUCTIBLE){
+                            mapaTiles[tileXDisparo - 1][tileYDisparoInferior].tipoDeColision = Tile.PASABLE;
+                            mapaTiles[tileXDisparo - 1][tileYDisparoInferior].imagen = CargadorGraficos.cargarDrawable(context,
+                                    R.drawable.tile_transparente);
+                        }
+                        iterator.remove();
+                        continue;
+                    }
+                }
+            }
+            //arriba
+            if(disparoEnemigo.velocidadY <= 0){
+                if(tileYDisparo -1 >= 0 && tileXDisparoIzquierda < anchoMapaTiles() - 1
+                        && mapaTiles[tileXDisparoIzquierda][tileYDisparo - 1].tipoDeColision == Tile.PASABLE
+                        &&mapaTiles[tileXDisparoDerecha][tileYDisparo - 1].tipoDeColision == Tile.PASABLE){
+                    disparoEnemigo.y += disparoEnemigo.velocidadY;
+                }else if(tileYDisparo >= 0){
+                    int TileDisparoBordeArriba = tileYDisparo * Tile.altura;
+                    double distanciaY = (disparoEnemigo.y - disparoEnemigo.cArriba) - TileDisparoBordeArriba;
+                    if(distanciaY > 0){
+                        double velocidadNecesaria = Utilidades.proximoACero(-distanciaY,disparoEnemigo.velocidadY);
+                        disparoEnemigo.y += velocidadNecesaria;
+                    }else{
+                        if(mapaTiles[tileXDisparoIzquierda][tileYDisparo - 1].tipoDeColision == Tile.DESTRUCTIBLE){
+                            mapaTiles[tileXDisparoIzquierda][tileYDisparo - 1].tipoDeColision = Tile.PASABLE;
+                            mapaTiles[tileXDisparoIzquierda][tileYDisparo - 1].imagen = CargadorGraficos.cargarDrawable(context,
+                                    R.drawable.tile_transparente);
+                        }
+                        if(mapaTiles[tileXDisparoDerecha][tileYDisparo - 1].tipoDeColision == Tile.DESTRUCTIBLE){
+                            mapaTiles[tileXDisparoDerecha][tileYDisparo - 1].tipoDeColision = Tile.PASABLE;
+                            mapaTiles[tileXDisparoDerecha][tileYDisparo - 1].imagen = CargadorGraficos.cargarDrawable(context,
+                                    R.drawable.tile_transparente);
+                        }
+                        iterator.remove();
+                        continue;
+                    }
+                }
+            }
+            //abajo
+            if(disparoEnemigo.velocidadY > 0){
+                if(tileYDisparo + 1 <= altoMapaTiles()-1 &&
+                        mapaTiles[tileXDisparoDerecha][tileYDisparo + 1].tipoDeColision == Tile.PASABLE &&
+                        mapaTiles[tileXDisparoIzquierda][tileYDisparo + 1].tipoDeColision == Tile.PASABLE){
+                    disparoEnemigo.y += disparoEnemigo.velocidadY;
+                }else if(tileYDisparo <= altoMapaTiles()-1){
+                    int TileDisparoBordeAbajo = tileYDisparo * Tile.altura +Tile.altura;
+                    double distanciaY = TileDisparoBordeAbajo - (disparoEnemigo.y + disparoEnemigo.cAbajo);
+                    if(distanciaY > 0){
+                        double velocidadNecesaria = Math.min(distanciaY,disparoEnemigo.velocidadY);
+                        disparoEnemigo.y += velocidadNecesaria;
+                    }else{
+                        if( mapaTiles[tileXDisparoDerecha][tileYDisparo + 1].tipoDeColision == Tile.DESTRUCTIBLE){
+                            mapaTiles[tileXDisparoDerecha][tileYDisparo + 1].tipoDeColision = Tile.PASABLE;
+                            mapaTiles[tileXDisparoDerecha][tileYDisparo + 1].imagen = CargadorGraficos.cargarDrawable(context,
+                                    R.drawable.tile_transparente);
+                        }
+                        if(mapaTiles[tileXDisparoIzquierda][tileYDisparo + 1].tipoDeColision == Tile.DESTRUCTIBLE){
+                            mapaTiles[tileXDisparoIzquierda][tileYDisparo + 1].tipoDeColision = Tile.PASABLE;
+                            mapaTiles[tileXDisparoIzquierda][tileYDisparo + 1].imagen = CargadorGraficos.cargarDrawable(context,
+                                    R.drawable.tile_transparente);
+                        }
+                        iterator.remove();
+                        continue;
+                    }
+
+                }
+            }
+
+        }
+
+
 
         for (Iterator<DisparoJugador> iterator = disparosJugador.iterator(); iterator.hasNext(); ) {
             DisparoJugador disparoJugador = iterator.next();
