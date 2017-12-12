@@ -47,6 +47,8 @@ public class EnemigoDisparador extends  Modelo {
     private int radioAtaque = 700;
     private boolean radioParaDisparo;
 
+    public int vida = 20;
+
     public EnemigoDisparador(Context context, double x, double y) {
         super(context, 0, 0, 40,40 );
 
@@ -117,6 +119,20 @@ public class EnemigoDisparador extends  Modelo {
         sprites.put(DISPARO_DERECHA, disparoDerecha);
 
         sprite = caminandoDerecha;
+    }
+
+    public void recibirDaño(int daño){
+        vida -= daño;
+        System.out.println("Vida restante : "+vida);
+        if(vida <= 0){
+            destruir();
+        }
+    }
+
+    private void destruir (){
+        velocidadX = 0;
+        velocidadY = 0;
+        estado = INACTIVO;
     }
 
     @Override

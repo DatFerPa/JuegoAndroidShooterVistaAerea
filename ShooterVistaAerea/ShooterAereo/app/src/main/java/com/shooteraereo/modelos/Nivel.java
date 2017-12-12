@@ -106,16 +106,18 @@ public class Nivel {
             }
 
             for(EnemigoDisparador enemigo : enemigosDisparadores){
-                enemigo.jugadorEnRadioYDisparoPosible(jugador.x,jugador.y);
-                if(enemigo.seHaDisparado){
-                    //generamos el disparo
-                    enemigo.seHaDisparado = false;
-                    System.out.println("Jugador : "+(float)jugador.x +"  -  "+(float)jugador.y);
-                    disparosEnemigo.add(new DisparoEnemigo(context,enemigo.x,enemigo.y,(float)jugador.x,(float)jugador.y));
-                    System.out.println("Enemigo disparando al jugador");
+                if(enemigo.estado == enemigo.ACTIVO) {
+                    enemigo.jugadorEnRadioYDisparoPosible(jugador.x, jugador.y);
+                    if (enemigo.seHaDisparado) {
+                        //generamos el disparo
+                        enemigo.seHaDisparado = false;
+                        System.out.println("Jugador : " + (float) jugador.x + "  -  " + (float) jugador.y);
+                        disparosEnemigo.add(new DisparoEnemigo(context, enemigo.x, enemigo.y, (float) jugador.x, (float) jugador.y));
+                        System.out.println("Enemigo disparando al jugador");
+                    }
+                    enemigo.actualizarTiempoParaMoverse();
+                    enemigo.actualizarTiempoDisparo();
                 }
-                enemigo.actualizarTiempoParaMoverse();
-                enemigo.actualizarTiempoDisparo();
                 enemigo.actualizar(tiempo);
 
             }
@@ -866,6 +868,23 @@ public class Nivel {
             int tileXDisparoDerecha = (int) (disparoJugador.x + disparoJugador.cDerecha) / Tile.ancho;
             int tileXDisparoIzquierda = (int) (disparoJugador.x - disparoJugador.cIzquierda) / Tile.ancho;
 
+            for(EnemigoDisparador enemigo: enemigosDisparadores){
+                 if(disparoJugador.colisiona(enemigo)){
+                     iterator.remove();
+                     enemigo.recibirDaño(jugador.dañoAtaque);
+                     break;
+                 }
+
+             }
+
+            for(EnemigoPersigue enemigo: enemigosPersigue){
+                if(disparoJugador.colisiona(enemigo)){
+                    iterator.remove();
+                    enemigo.recibirDaño(jugador.dañoAtaque);
+                    break;
+                }
+
+            }
 
 
 

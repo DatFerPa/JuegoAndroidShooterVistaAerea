@@ -33,6 +33,8 @@ public class EnemigoPersigue extends Modelo{
     private int tiempoAtaque = 10;
     private int tiempoActual = 0;
 
+    public int vida = 10;
+
     private int radioAtaque = 50;
 
     protected Sprite sprite;
@@ -107,6 +109,20 @@ public class EnemigoPersigue extends Modelo{
             tiempoActual++;
             return false;
         }
+    }
+
+    public void recibirDaño(int daño){
+        vida -= daño;
+        System.out.println("Vida restante : "+vida);
+        if(vida <= 0){
+            destruir();
+        }
+    }
+
+    private void destruir (){
+        velocidadX = 0;
+        velocidadY = 0;
+        estado = INACTIVO;
     }
 
     private void generarVelocidad(double jugadorX, double jugadorY) {
