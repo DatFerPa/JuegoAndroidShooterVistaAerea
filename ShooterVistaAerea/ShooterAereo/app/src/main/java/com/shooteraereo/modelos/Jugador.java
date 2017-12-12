@@ -172,6 +172,7 @@ public class Jugador  extends Modelo{
 
 
     public void dibujar(Canvas canvas){
+
         sprite.dibujarSprite(canvas, (int) x - Nivel.scrollEjeX , (int) y - Nivel.scrollEjeY);
     }
 

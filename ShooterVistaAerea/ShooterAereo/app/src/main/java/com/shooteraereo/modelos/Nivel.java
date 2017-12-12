@@ -897,7 +897,7 @@ public class Nivel {
             if(disparoJugador.velocidadY <= 0){
                 if(tileYDisparo -1 >= 0 && tileXDisparoIzquierda < anchoMapaTiles() - 1
                         && mapaTiles[tileXDisparoIzquierda][tileYDisparo - 1].tipoDeColision == Tile.PASABLE
-                &&mapaTiles[tileXDisparoDerecha][tileYDisparo - 1].tipoDeColision == Tile.PASABLE){
+                        &&mapaTiles[tileXDisparoDerecha][tileYDisparo - 1].tipoDeColision == Tile.PASABLE){
                     disparoJugador.y += disparoJugador.velocidadY;
                 }else if(tileYDisparo >= 0){
                     int TileDisparoBordeArriba = tileYDisparo * Tile.altura;
@@ -928,8 +928,8 @@ public class Nivel {
                         mapaTiles[tileXDisparoIzquierda][tileYDisparo + 1].tipoDeColision == Tile.PASABLE){
                     disparoJugador.y += disparoJugador.velocidadY;
                 }else if(tileYDisparo <= altoMapaTiles()-1){
-                        int TileDisparoBordeAbajo = tileYDisparo * Tile.altura +Tile.altura;
-                        double distanciaY = TileDisparoBordeAbajo - (disparoJugador.y + disparoJugador.cAbajo);
+                    int TileDisparoBordeAbajo = tileYDisparo * Tile.altura +Tile.altura;
+                    double distanciaY = TileDisparoBordeAbajo - (disparoJugador.y + disparoJugador.cAbajo);
                     if(distanciaY > 0){
                         double velocidadNecesaria = Math.min(distanciaY,disparoJugador.velocidadY);
                         disparoJugador.y += velocidadNecesaria;
