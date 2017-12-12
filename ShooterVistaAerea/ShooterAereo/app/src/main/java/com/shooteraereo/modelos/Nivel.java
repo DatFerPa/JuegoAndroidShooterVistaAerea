@@ -47,6 +47,9 @@ public class Nivel {
     private List<Bomba> bombas;//solo se va a premitir una
     private List<EnemigoDisparador> enemigosDisparadores;
     private List<DisparoEnemigo> disparosEnemigo;
+    private List<EnemigoPersigue> enemigosPersigue;
+
+    //private EnemigoPersigue enemigoP;
 
     public boolean inicializado;
 
@@ -70,6 +73,7 @@ public class Nivel {
         bombas = new LinkedList<Bomba>();
         powerUps = new LinkedList<PowerUp>();
         enemigosDisparadores = new LinkedList<EnemigoDisparador>();
+        enemigosPersigue = new LinkedList<EnemigoPersigue>();
         disparosEnemigo = new LinkedList<DisparoEnemigo>();
         inicializarMapaTiles();
     }
@@ -83,6 +87,9 @@ public class Nivel {
                 bomba.actualizar(tiempo);
             }
 
+            for(EnemigoPersigue enemigo : enemigosPersigue) {
+                enemigo.actualizar(tiempo);
+            }
             jugador.procesarOrdenes(posicionJugadorX, posicionJugadorY, botonDisparando);
             boolean disparado = jugador.posibleDisparo();
 
@@ -135,6 +142,10 @@ public class Nivel {
             fondo.dibujar(canvas);
             dibujarTiles(canvas);
             jugador.dibujar(canvas);
+            for(EnemigoPersigue enemigo : enemigosPersigue) {
+                enemigo.dibujar(canvas);
+            }
+
 
             for(Bomba bomba:bombas){
                 bomba.dibujar(canvas);
@@ -320,6 +331,13 @@ public class Nivel {
                 enemigosDisparadores.add(new EnemigoDisparador(context,xCentroAbajoTileZ,yCentroAbajoTileZ));
 
                 return new Tile(null, Tile.PASABLE);
+
+            case 'S':
+                int xCentroAbajoTileS = x * Tile.ancho + Tile.ancho /2;
+                int yCentroAbajoTileS = y * Tile.altura + Tile.altura /2;
+                enemigosPersigue.add( new EnemigoPersigue(context,xCentroAbajoTileS,yCentroAbajoTileS));
+
+                return new Tile(null,Tile.PASABLE);
             default:
                 //cualquier otro caso
                 return new Tile(null, Tile.PASABLE);

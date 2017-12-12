@@ -45,6 +45,7 @@ public class EnemigoDisparador extends  Modelo {
     public int tiempoActual = 0;
 
     private int radioAtaque = 700;
+    private boolean radioParaDisparo;
 
     public EnemigoDisparador(Context context, double x, double y) {
         super(context, 0, 0, 40,40 );
@@ -101,7 +102,7 @@ public class EnemigoDisparador extends  Modelo {
 
                 ancho, altura,
 
-                8, 8, false);
+                8, 8, true);
 
         sprites.put(DISPARO_IZQUIERDA, disparoIzquierda);
 
@@ -111,7 +112,7 @@ public class EnemigoDisparador extends  Modelo {
 
                 ancho, altura,
 
-                8, 8, false);
+                8, 8, true);
 
         sprites.put(DISPARO_DERECHA, disparoDerecha);
 
@@ -123,23 +124,34 @@ public class EnemigoDisparador extends  Modelo {
         super.actualizar(tiempo);
         boolean finSprite = sprite.actualizar(tiempo);
 
-        if (velocidadX >= 0 ) {
-            orientacion = DERECHA;
-            sprite = sprites.get(CAMINANDO_DERECHA);
+        if ( estado == INACTIVO && finSprite == true){
+            estado = ELIMINAR;
         }
-        if (velocidadX < 0 ) {
-            orientacion = IZQUIERDA;
-            sprite = sprites.get(CAMINANDO_IZQUIERDA);
-        }
-        if(seHaDisparado){
+        if (estado == INACTIVO){
+            if (velocidadX > 0)
+                sprite = sprites.get(MUERTE_DERECHA);
+            else
+                sprite = sprites.get(MUERTE_IZQUIERDA);
+        }else {
 
-            if(velocidadX < 0){
-                sprite = sprites.get(DISPARO_IZQUIERDA);
-            }else if(velocidadX >= 0){
-                sprite = sprites.get(DISPARO_DERECHA);
+            if (radioParaDisparo) {
+
+                if (velocidadX < 0) {
+                    sprite = sprites.get(DISPARO_IZQUIERDA);
+                } else if (velocidadX >= 0) {
+                    sprite = sprites.get(DISPARO_DERECHA);
+                }
+            } else {
+                if (velocidadX >= 0) {
+                    orientacion = DERECHA;
+                    sprite = sprites.get(CAMINANDO_DERECHA);
+                }
+                if (velocidadX < 0) {
+                    orientacion = IZQUIERDA;
+                    sprite = sprites.get(CAMINANDO_IZQUIERDA);
+                }
             }
         }
-
 
 
 
@@ -174,11 +186,16 @@ public class EnemigoDisparador extends  Modelo {
     public void jugadorEnRadioYDisparoPosible(double xJugador, double yJugador){
         double distancia = Math.sqrt(Math.pow(xJugador - x, 2) + Math.pow(yJugador - y, 2));
         //disparo cuando jugador dentro del radio y cuando tiempo para disparar
-        if(distancia < radioAtaque && disparando == true){
+
+        radioParaDisparo = distancia < radioAtaque;
+
+        if(radioParaDisparo && disparando == true){
             disparando = false;
             seHaDisparado = true;
+
         }else{
             seHaDisparado = false;
+
         }
     }
 
