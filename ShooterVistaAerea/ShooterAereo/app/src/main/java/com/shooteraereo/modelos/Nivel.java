@@ -88,6 +88,10 @@ public class Nivel {
             }
 
             for(EnemigoPersigue enemigo : enemigosPersigue) {
+                if(enemigo.ataque()){
+                    //daño al jugador
+                }
+                enemigo.actualizarTiempoMovimiento(jugador.x,jugador.y);
                 enemigo.actualizar(tiempo);
             }
             jugador.procesarOrdenes(posicionJugadorX, posicionJugadorY, botonDisparando);
@@ -512,11 +516,36 @@ public class Nivel {
         }
         //fin reglas jugador
 
+        for (Iterator<EnemigoPersigue> iterator = enemigosPersigue.iterator(); iterator.hasNext(); ) {
+            EnemigoPersigue enemigo = iterator.next();
+            if (enemigo.estado == enemigo.ELIMINAR){
+
+                iterator.remove();
+                continue;
+            }
+
+            if(enemigo.estado != enemigo.ACTIVO){
+                continue;
+            }
+            //regla de ataque al jugador
+
+            enemigo.x += enemigo.velocidadX;
+            enemigo.y += enemigo.velocidadY;
+        }
+
 
         for (Iterator<EnemigoDisparador> iterator = enemigosDisparadores.iterator(); iterator.hasNext(); ) {
             EnemigoDisparador enemigo = iterator.next();
 
+            if (enemigo.estado == enemigo.ELIMINAR){
 
+                iterator.remove();
+                continue;
+            }
+
+            if(enemigo.estado != enemigo.ACTIVO){
+                continue;
+            }
 
 
 

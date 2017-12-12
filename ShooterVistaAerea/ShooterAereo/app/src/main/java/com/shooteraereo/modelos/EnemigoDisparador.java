@@ -189,7 +189,7 @@ public class EnemigoDisparador extends  Modelo {
 
         radioParaDisparo = distancia < radioAtaque;
 
-        if(radioParaDisparo && disparando == true){
+        if(radioParaDisparo && disparando == true && this.estado == ACTIVO){
             disparando = false;
             seHaDisparado = true;
 

@@ -15,22 +15,29 @@ import java.util.HashMap;
 
 public class EnemigoPersigue extends Modelo{
 
+    public int estado = ACTIVO;
+    public static final int ACTIVO = 1;
+    public static final int INACTIVO = 0;
+    public static final int ELIMINAR = -1;
+
     public static final String MOVIENDO = "moviendo";
     public static final String ATACANDO = "atacando";
     public static final String MURIENDO = "muriendo";
 
+    public static final double VELOCIDAD_BASE = 3;
     public double velocidadX = 0;
     public double velocidadY = 0;
 
     private int tiempoMoviemiento = 0;
 
-    private int tiempoAtaque = 30;
+    private int tiempoAtaque = 10;
     private int tiempoActual = 0;
 
-    private int radioAtaque = 200;
+    private int radioAtaque = 50;
 
     protected Sprite sprite;
     protected HashMap<String,Sprite> sprites = new HashMap<>();
+    private boolean atacando = false;
 
     public EnemigoPersigue(Context context, double x, double y) {
         super(context, x, y, 40, 40);
@@ -69,7 +76,62 @@ public class EnemigoPersigue extends Modelo{
     @Override
     public void actualizar(long tiempo){
         boolean finsprite = sprite.actualizar(tiempo);
-        sprite = sprites.get(MOVIENDO);
+        if ( estado == INACTIVO && finsprite == true){
+            estado = ELIMINAR;
+        }
+        if (estado == INACTIVO){
+                sprite = sprites.get(MURIENDO);
+        }else {
+            if(atacando){
+                sprite = sprites.get(ATACANDO);
+            }else {
+                sprite = sprites.get(MOVIENDO);
+            }
+        }
+    }
+
+    public void actualizarTiempoMovimiento(double jugadorX, double jugadorY){
+        if(this.estado == ACTIVO) {
+            if (tiempoMoviemiento % 20 == 0 ) {
+                    generarVelocidad(jugadorX, jugadorY);
+            }
+            ++tiempoMoviemiento;
+        }
+    }
+
+    public boolean ataque(){
+        if(tiempoActual >= tiempoAtaque && atacando){
+            tiempoActual = 0;
+            return true;
+        }else{
+            tiempoActual++;
+            return false;
+        }
+    }
+
+    private void generarVelocidad(double jugadorX, double jugadorY) {
+
+        float posDisparoX =  (float)jugadorX - (float)x ;
+        float posDiisparoY = (float)jugadorY-(float)y;
+
+        double moduloVector = (Math.sqrt(Math.pow((double)posDisparoX,2)+Math.pow((double)posDiisparoY,2)));
+        if(moduloVector < radioAtaque){
+            velocidadY = 0;
+            velocidadX = 0;
+            atacando = true;
+        }else {
+            atacando = false;
+
+            float vecX = (posDisparoX) / (float) ((Math.sqrt(Math.pow((double) posDisparoX, 2) + Math.pow((double) posDiisparoY, 2))));
+            float vecY = (posDiisparoY) / (float) ((Math.sqrt(Math.pow((double) posDisparoX, 2) + Math.pow((double) posDiisparoY, 2))));
+
+            float posicionXCalculada = 8 * vecX;
+            float posicionYCalculada = 8 * vecY;
+
+
+            velocidadY = posicionYCalculada;
+            velocidadX = posicionXCalculada;
+        }
     }
 
 
