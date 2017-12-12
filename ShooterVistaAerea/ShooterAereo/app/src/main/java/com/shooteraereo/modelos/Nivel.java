@@ -40,15 +40,19 @@ public class Nivel {
     public float posicionDisparoX;
     public float posicionDisparoY;
     public boolean botonDisparando = false;
+    public boolean botonBombaPulsado = false;
 
     //listas de modelos
     private List<DisparoJugador> disparosJugador;
     private List<PowerUp> powerUps;
+    private List<Bomba> bombas;//solo se va a premitir una
 
     public boolean inicializado;
 
     public Nivel(Context context, int numeroNivel) throws Exception {
         inicializado = false;
+        botonBombaPulsado = false;
+        botonDisparando = false;
 
         this.context = context;
         this.numeroNivel = numeroNivel;
@@ -62,6 +66,7 @@ public class Nivel {
         scrollEjeY = 0;
         fondo = new Fondo(context, CargadorGraficos.cargarBitmap(context, R.drawable.background), 0);
         disparosJugador = new LinkedList<DisparoJugador>();
+        bombas = new LinkedList<Bomba>();
         powerUps = new LinkedList<PowerUp>();
         inicializarMapaTiles();
     }
@@ -71,11 +76,20 @@ public class Nivel {
         if (inicializado) {
             jugador.sumarTiempo();
 
+            for(Bomba bomba: bombas){
+                bomba.actualizar(tiempo);
+            }
+
             jugador.procesarOrdenes(posicionJugadorX, posicionJugadorY, botonDisparando);
             boolean disparado = jugador.posibleDisparo();
 
             for (DisparoJugador disparoJugador : disparosJugador) {
                 disparoJugador.actualizar(tiempo);
+            }
+
+            if(botonBombaPulsado && jugador.isbombaUsada()== false){
+                jugador.usarBomba();
+                bombas.add(new Bomba(context,jugador.x,jugador.y));
             }
 
             if (botonDisparando && disparado) {
@@ -99,6 +113,11 @@ public class Nivel {
             fondo.dibujar(canvas);
             dibujarTiles(canvas);
             jugador.dibujar(canvas);
+
+            for(Bomba bomba:bombas){
+                bomba.dibujar(canvas);
+            }
+
 
             for (DisparoJugador disparoJugador : disparosJugador) {
                 disparoJugador.dibujar(canvas);
@@ -274,6 +293,19 @@ public class Nivel {
     }
 
     private void aplicarReglasMovimiento() {
+
+
+        for (Iterator<Bomba> iterator = bombas.iterator(); iterator.hasNext(); ) {
+            Bomba bomba = iterator.next();
+
+            if(bomba.tiempoEnExplosion <= 0){;
+                iterator.remove();
+                continue;
+            }else {
+                bomba.actualizarTiempos();
+            }
+        }
+
         int tileXJugadorIzquierda
                 = (int) (jugador.x - (jugador.ancho / 2 - 1)) / Tile.ancho;
         int tileXJugadorDerecha

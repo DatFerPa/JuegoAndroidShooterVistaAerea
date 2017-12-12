@@ -47,6 +47,8 @@ public class Jugador  extends Modelo{
 
     boolean disparando= false;
 
+    private boolean bombaUsada = false;
+
     public static final int VIDA_MAX= 100;
     public int vida;
     public boolean golpeado = false;
@@ -131,6 +133,14 @@ public class Jugador  extends Modelo{
                 sprite = sprites.get(DISPARANDO_DERECHA);
             }
         }
+    }
+
+    public boolean isbombaUsada(){
+        return this.bombaUsada;
+    }
+
+    public void usarBomba(){
+        this.bombaUsada = true;
     }
 
     public void restarVida(int valor){

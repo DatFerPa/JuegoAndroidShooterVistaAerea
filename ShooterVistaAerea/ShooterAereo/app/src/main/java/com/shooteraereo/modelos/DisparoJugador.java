@@ -43,6 +43,8 @@ public class DisparoJugador extends Modelo {
 
     public void actualizar (long tiempo) {
         sprite.actualizar(tiempo);
+
+
     }
 
     public void dibujar(Canvas canvas){

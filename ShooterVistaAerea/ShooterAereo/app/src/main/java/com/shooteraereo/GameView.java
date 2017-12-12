@@ -126,8 +126,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     }else{
                         nivel.botonDisparando = false;
                     }
+                }
+
+                if(botonBomba.estaPulsado(x[i],y[i])){
+                    if(accion[i] == ACTION_DOWN){
+                        nivel.botonBombaPulsado = true;
+                    }
 
                 }
+
+
             }
         }
         if(!pulsacionPadMover) {

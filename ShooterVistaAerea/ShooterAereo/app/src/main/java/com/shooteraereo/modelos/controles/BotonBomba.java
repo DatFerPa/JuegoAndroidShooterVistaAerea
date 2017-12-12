@@ -23,5 +23,18 @@ public class BotonBomba extends Modelo {
         imagen = CargadorGraficos.cargarDrawable(context, R.drawable.botonbomba);
     }
 
+    public boolean estaPulsado(float clickX, float clickY) {
+        boolean estaPulsado = false;
+
+        //hacemos click dentro de la circunferencia
+        double distancia = Math.sqrt(Math.pow(clickX - x, 2) + Math.pow(clickY - y, 2));
+
+        if(distancia < 35){
+            estaPulsado = true;
+            System.out.println("bomaba pulsado");
+        }
+        return estaPulsado;
+    }
+
 
 }
