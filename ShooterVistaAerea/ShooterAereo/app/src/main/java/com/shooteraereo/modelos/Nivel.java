@@ -1,12 +1,16 @@
 package com.shooteraereo.modelos;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.Log;
 
 import com.shooteraereo.GameView;
 import com.shooteraereo.R;
 import com.shooteraereo.gestores.CargadorGraficos;
+import com.shooteraereo.gestores.GestorAudio;
 import com.shooteraereo.gestores.Utilidades;
 
 import java.io.BufferedReader;
@@ -48,19 +52,45 @@ public class Nivel {
     private List<EnemigoDisparador> enemigosDisparadores;
     private List<DisparoEnemigo> disparosEnemigo;
     private List<EnemigoPersigue> enemigosPersigue;
+    public Bitmap mensaje;
+
+    public GameView gameView;
+
+
+    public boolean gameOver = false; //jugador muere
+    public boolean win = false; //se eliminan a todos los enemigos
 
     //private EnemigoPersigue enemigoP;
 
     public boolean inicializado;
+    public boolean nivelPausado;
 
     public Nivel(Context context, int numeroNivel) throws Exception {
         inicializado = false;
         botonBombaPulsado = false;
         botonDisparando = false;
+        nivelPausado = false;
+
+
 
         this.context = context;
         this.numeroNivel = numeroNivel;
         inicializar();
+
+        inicializado = true;
+    }
+
+    public Nivel(Context context, int numeroNivel,Jugador jugador) throws Exception {
+        inicializado = false;
+        botonBombaPulsado = false;
+        botonDisparando = false;
+        nivelPausado = false;
+
+
+
+        this.context = context;
+        this.numeroNivel = numeroNivel;
+        inicializar(jugador);
 
         inicializado = true;
     }
@@ -76,10 +106,16 @@ public class Nivel {
         enemigosPersigue = new LinkedList<EnemigoPersigue>();
         disparosEnemigo = new LinkedList<DisparoEnemigo>();
         inicializarMapaTiles();
+       GestorAudio.getInstancia().reproducirSonido(GestorAudio.KILL_IT);
+    }
+
+    public void inicializar(Jugador jugador) throws Exception{
+        this.jugador = jugador;
+        inicializar();
     }
 
 
-    public void actualizar(long tiempo) {
+    public void actualizar(long tiempo) throws Exception {
         if (inicializado) {
             jugador.sumarTiempo();
 
@@ -90,12 +126,14 @@ public class Nivel {
             for(EnemigoPersigue enemigo : enemigosPersigue) {
                 if(enemigo.ataque()){
                     //daño al jugador
+                    GestorAudio.getInstancia().reproducirSonido(GestorAudio.ENEMIGO_PERSIGUE_ATAQUE);
+                    jugador.restarVida(EnemigoPersigue.DAÑO);
                 }
                 enemigo.actualizarTiempoMovimiento(jugador.x,jugador.y);
                 enemigo.actualizar(tiempo);
             }
             jugador.procesarOrdenes(posicionJugadorX, posicionJugadorY, botonDisparando);
-            boolean disparado = jugador.posibleDisparo();
+            boolean jugadorPosibleDisparo = jugador.posibleDisparo();
 
             for (DisparoJugador disparoJugador : disparosJugador) {
                 disparoJugador.actualizar(tiempo);
@@ -112,6 +150,7 @@ public class Nivel {
                         //generamos el disparo
                         enemigo.seHaDisparado = false;
                         System.out.println("Jugador : " + (float) jugador.x + "  -  " + (float) jugador.y);
+                        GestorAudio.getInstancia().reproducirSonido(GestorAudio.DISPARO_ENEMIGO);
                         disparosEnemigo.add(new DisparoEnemigo(context, enemigo.x, enemigo.y, (float) jugador.x, (float) jugador.y));
                         System.out.println("Enemigo disparando al jugador");
                     }
@@ -127,11 +166,10 @@ public class Nivel {
                 bombas.add(new Bomba(context,jugador.x,jugador.y));
             }
 
-            if (botonDisparando && disparado) {
+            if (botonDisparando && jugadorPosibleDisparo) {
                 System.out.println("Comenzamos el disparo");
-                jugador.disparando = false;
                 jugador.ponerTiempoaCero();
-                botonDisparando = false;
+                GestorAudio.getInstancia().reproducirSonido(GestorAudio.DISPARO_JUGADOR);
                 disparosJugador.add(new DisparoJugador(context, jugador.x, jugador.y, posicionDisparoX, posicionDisparoY));
                 System.out.println("Se ha disparado");
 
@@ -139,7 +177,24 @@ public class Nivel {
 
             jugador.actualizar(tiempo);
             aplicarReglasMovimiento();
+            if(nivelCompletado()){
+                mensaje = CargadorGraficos.cargarBitmap(context,R.drawable.you_win);
+                nivelPausado = true;
+                GestorAudio.getInstancia().reproducirSonido(GestorAudio.VICTORY);
+                win = true;
+            }
+
+            if(jugadorMuerto()){
+                mensaje = CargadorGraficos.cargarBitmap(context,R.drawable.you_died);
+                nivelPausado = true;
+                GestorAudio.getInstancia().reproducirSonido(GestorAudio.LOSER);
+                gameOver = true;
+            }
         }
+    }
+
+    private boolean jugadorMuerto() {
+        return (jugador.vida <=0)?true:false;
     }
 
 
@@ -174,7 +229,27 @@ public class Nivel {
                 powerUp.dibujar(canvas);
             }
 
+            if (nivelPausado){
+                // la foto mide 480x320
+                Rect orgigen = new Rect(0,0 ,
+                        480,320);
+
+                Paint efectoTransparente = new Paint();
+                efectoTransparente.setAntiAlias(true);
+
+                Rect destino = new Rect((int)(GameView.pantallaAncho/2 - 480/2),
+                        (int)(GameView.pantallaAlto/2 - 320/2),
+                        (int)(GameView.pantallaAncho/2 + 480/2),
+                        (int)(GameView.pantallaAlto/2 + 320/2));
+                canvas.drawBitmap(mensaje,orgigen,destino, null);
+            }
+
         }
+    }
+
+
+    private  boolean nivelCompletado(){
+        return (enemigosDisparadores.size() == 0 && enemigosPersigue.size()==0)? true:false;
     }
 
     private void dibujarTiles(Canvas canvas) {
@@ -307,8 +382,12 @@ public class Nivel {
                 // Posicion centro abajo
                 int xCentroAbajoTile = x * Tile.ancho + Tile.ancho / 2;
                 int yCentroAbajoTile = y * Tile.altura + Tile.altura;
-                jugador = new Jugador(context, xCentroAbajoTile, yCentroAbajoTile);
-
+                if(jugador==null) {
+                    jugador = new Jugador(context, xCentroAbajoTile, yCentroAbajoTile);
+                }else{
+                    jugador.x = xCentroAbajoTile;
+                    jugador.y = yCentroAbajoTile;
+                }
                 return new Tile(null, Tile.PASABLE);
 
             case 'P':
@@ -355,6 +434,18 @@ public class Nivel {
 
         for (Iterator<Bomba> iterator = bombas.iterator(); iterator.hasNext(); ) {
             Bomba bomba = iterator.next();
+
+            for(EnemigoDisparador enemigo: enemigosDisparadores){
+                if(bomba.exploto&&bomba.colisiona(enemigo)){
+                    enemigo.recibirDaño(100);
+                }
+            }
+
+            for(EnemigoPersigue enemigo: enemigosPersigue){
+                if(bomba.exploto&&bomba.colisiona(enemigo)){
+                    enemigo.recibirDaño(100);
+                }
+            }
 
             if(bomba.tiempoEnExplosion <= 0){;
                 iterator.remove();
@@ -718,6 +809,11 @@ public class Nivel {
             int tileXDisparoDerecha = (int) (disparoEnemigo.x + disparoEnemigo.cDerecha) / Tile.ancho;
             int tileXDisparoIzquierda = (int) (disparoEnemigo.x - disparoEnemigo.cIzquierda) / Tile.ancho;
 
+            if(disparoEnemigo.colisiona(jugador)){
+                iterator.remove();
+                jugador.restarVida(EnemigoDisparador.DAÑO);
+                break;
+            }
 
 
             //derecha

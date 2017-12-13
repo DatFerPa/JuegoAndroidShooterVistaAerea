@@ -33,7 +33,9 @@ public class EnemigoPersigue extends Modelo{
     private int tiempoAtaque = 10;
     private int tiempoActual = 0;
 
-    public int vida = 10;
+    public int vida = 20;
+
+    public static final int DAÑO = 5;
 
     private int radioAtaque = 50;
 

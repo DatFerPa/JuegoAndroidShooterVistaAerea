@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 
 import com.shooteraereo.R;
 import com.shooteraereo.gestores.CargadorGraficos;
+import com.shooteraereo.gestores.GestorAudio;
 import com.shooteraereo.graficos.Sprite;
 
 import java.util.HashMap;
@@ -19,7 +20,7 @@ public class Bomba extends Modelo {
     public static final String BOMBA_EXPLOTANDO = "bombaExplotando";
 
     public boolean exploto = false;
-    public int tiempoExplotar = 10;
+    public int tiempoExplotar = 30;
     public int tiempoEnExplosion = 20;
 
     private Sprite sprite;
@@ -66,6 +67,7 @@ public class Bomba extends Modelo {
 
     public void actualizarTiempos(){
         if(tiempoExplotar <= 0 && exploto==false){
+            GestorAudio.getInstancia().reproducirSonido(GestorAudio.BOMBA);
             exploto = true;
         }else {
             if (!exploto) {

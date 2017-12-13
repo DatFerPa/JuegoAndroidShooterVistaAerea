@@ -45,7 +45,7 @@ public class BarraVida extends Modelo {
 
         linea.setColor(Color.GREEN);
         linea.setStrokeWidth(20);
-        canvas.drawLine((int) x + 5, (int) y - 10, (int) ((x + 5) + (( canvas.getWidth() - 2) / (valorMaximo + 1)) * valorActual + 1), (int) y - 10, linea);
+        canvas.drawLine((int) x +5, (int) y - 10, (int) ((x + 5) + (( canvas.getWidth() - 2) / (valorMaximo + 1)) * valorActual + 1), (int) y - 10, linea);
 
     }
 

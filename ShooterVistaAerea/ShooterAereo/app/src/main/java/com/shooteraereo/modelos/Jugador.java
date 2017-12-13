@@ -24,6 +24,7 @@ public class Jugador  extends Modelo{
     public static final String DISPARANDO_DERECHA = "Disparando_derecha";
     public static final String DISPARANDO_IZQUIERDA = "Disparando_izquierda";
 
+
     public static final int DISPARO_COLDOWN_MAXIMO = 5;
     public static final int DISPARO_COLDOWN_BASE = 20;
 
@@ -36,6 +37,8 @@ public class Jugador  extends Modelo{
     int dañoAtaque;
 
     public static float VELOCIDAD = 3;
+    double ultimaVel;
+
     double velocidadX;
     double velocidadY;
 
@@ -45,13 +48,12 @@ public class Jugador  extends Modelo{
     double xInicial;
     double yInicial;
 
-    boolean disparando= false;
-
     private boolean bombaUsada = false;
 
     public static final int VIDA_MAX= 100;
     public int vida;
-    public boolean golpeado = false;
+    private boolean animDisparar;
+
 
     public Jugador(Context context, double xInicial, double yInicial) {
         super(context, 0, 0, 40, 40);
@@ -73,15 +75,15 @@ public class Jugador  extends Modelo{
 
     public void inicializar (){
         Sprite paradoDerecha = new Sprite(
-                CargadorGraficos.cargarDrawable(context, R.drawable.jugador_andando_derecha),
+                CargadorGraficos.cargarDrawable(context, R.drawable.jugador_quieto_derecha),
                 ancho, altura,
-                13, 14, true);
+                4, 4, true);
         sprites.put(PARADO_DERECHA, paradoDerecha);
 
         Sprite paradoIzquierda = new Sprite(
-                CargadorGraficos.cargarDrawable(context, R.drawable.jugador_andando_derecha),
+                CargadorGraficos.cargarDrawable(context, R.drawable.jugador_quieto_izquierda),
                 ancho, altura,
-                13, 14, true);
+                4, 4, true);
         sprites.put(PARADO_IZQUIERDA, paradoIzquierda);
 
         Sprite caminandoDerecha = new Sprite(
@@ -91,20 +93,20 @@ public class Jugador  extends Modelo{
         sprites.put(CAMINANDO_DERECHA, caminandoDerecha);
 
         Sprite caminandoIzquierda = new Sprite(
-                CargadorGraficos.cargarDrawable(context, R.drawable.jugador_andando_derecha),
+                CargadorGraficos.cargarDrawable(context, R.drawable.jugador_andando_izquierda),
                 ancho, altura,
                 13, 14, true);
         sprites.put(CAMINANDO_IZQUIERDA, caminandoIzquierda);
         Sprite disparandoDerecha = new Sprite(
-                CargadorGraficos.cargarDrawable(context, R.drawable.jugador_andando_derecha),
+                CargadorGraficos.cargarDrawable(context, R.drawable.jugador_dispara_derecha),
                 ancho, altura,
-                13, 14, false);
+                9, 9, true);
         sprites.put(DISPARANDO_DERECHA, disparandoDerecha);
 
         Sprite disparandoIzquierda = new Sprite(
-                CargadorGraficos.cargarDrawable(context, R.drawable.jugador_andando_derecha),
+                CargadorGraficos.cargarDrawable(context, R.drawable.jugador_dispara_izquierda),
                 ancho, altura,
-                13, 14, false);
+                9, 9, true);
         sprites.put(DISPARANDO_IZQUIERDA, disparandoIzquierda);
 
         // animación actual
@@ -114,23 +116,34 @@ public class Jugador  extends Modelo{
 
         boolean finSprite = sprite.actualizar(tiempo);
 
-        if(disparando && finSprite){
-            disparando = false;
-        }
 
-        if(velocidadX > 0){
-            sprite = sprites.get(CAMINANDO_DERECHA);
-        }
-        if(velocidadX < 0){
-            sprite = sprites.get(PARADO_DERECHA);
-        }
 
-        if(disparando){
+
+
+        if(animDisparar){
 
             if(velocidadX < 0){
                 sprite = sprites.get(DISPARANDO_IZQUIERDA);
-            }else if(velocidadX >= 0){
+            }else{
                 sprite = sprites.get(DISPARANDO_DERECHA);
+            }
+        }else{
+
+            if(velocidadX == 0 && velocidadY == 0){
+                if(ultimaVel>= 0){
+                    sprite = sprites.get(PARADO_DERECHA);
+                }else{
+                    sprite = sprites.get(PARADO_IZQUIERDA);
+                }
+            }else {
+
+                if (velocidadX >= 0) {
+                    sprite = sprites.get(CAMINANDO_DERECHA);
+                }
+                if (velocidadX < 0) {
+                    sprite = sprites.get(CAMINANDO_IZQUIERDA);
+                }
+
             }
         }
     }
@@ -144,7 +157,11 @@ public class Jugador  extends Modelo{
     }
 
     public void restarVida(int valor){
+
         this.vida -= valor;
+        if(vida < 0){
+            vida = 0;
+        }
     }
 
     public void sumarVida(int valor){
@@ -190,24 +207,31 @@ public class Jugador  extends Modelo{
     }
 
     public void procesarOrdenes(float posicionJugadorX, float posicionJugadorY,boolean disparar) {
-        float vecX = (posicionJugadorX) / (float) ((Math.sqrt(Math.pow((double) posicionJugadorX, 2) + Math.pow((double) posicionJugadorY, 2))));
-        float vecY = (posicionJugadorY) / (float) ((Math.sqrt(Math.pow((double) posicionJugadorX, 2) + Math.pow((double) posicionJugadorY, 2))));
 
-        float posicionXCalculada = VELOCIDAD * vecX;
-        float posicionYCalculada = VELOCIDAD * vecY;
+        System.out.println(posicionJugadorX+"  --  "+posicionJugadorY + " -- "+disparar);
+
+        if(posicionJugadorX != 0 && posicionJugadorY != 0) {
+
+            float vecX = (posicionJugadorX) / (float) ((Math.sqrt(Math.pow((double) posicionJugadorX, 2) + Math.pow((double) posicionJugadorY, 2))));
+            float vecY = (posicionJugadorY) / (float) ((Math.sqrt(Math.pow((double) posicionJugadorX, 2) + Math.pow((double) posicionJugadorY, 2))));
+
+            float posicionXCalculada = VELOCIDAD * vecX;
+            float posicionYCalculada = VELOCIDAD * vecY;
 
 
-        velocidadY = posicionYCalculada;
-        velocidadX = posicionXCalculada * -1;
+            velocidadY = posicionYCalculada;
+            velocidadX = posicionXCalculada * -1;
 
-        //System.out.println("Velocidades : x: "+velocidadY+" - y: "+velocidadY);
-        if (disparar && posibleDisparo()) {
-            this.disparando = true;
-            // preparar los sprites, no son bucles hay que reiniciarlos
-            sprites.get(DISPARANDO_DERECHA).setFrameActual(0);
-            sprites.get(DISPARANDO_IZQUIERDA).setFrameActual(0);
-
+        }else{
+            velocidadX = 0;
+            velocidadY =  0;
         }
+        //System.out.println(velocidadX+"  --  "+velocidadY);
+
+        if(velocidadY != 0 && velocidadX != 0){
+            ultimaVel = velocidadX;
+        }
+        animDisparar = disparar;
     }
 
 

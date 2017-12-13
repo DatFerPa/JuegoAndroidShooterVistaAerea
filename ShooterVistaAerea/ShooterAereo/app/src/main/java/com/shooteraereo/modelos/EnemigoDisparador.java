@@ -47,7 +47,9 @@ public class EnemigoDisparador extends  Modelo {
     private int radioAtaque = 700;
     private boolean radioParaDisparo;
 
-    public int vida = 20;
+    public int vida = 30;
+
+    public static final int DAÑO = 20;
 
     public EnemigoDisparador(Context context, double x, double y) {
         super(context, 0, 0, 40,40 );

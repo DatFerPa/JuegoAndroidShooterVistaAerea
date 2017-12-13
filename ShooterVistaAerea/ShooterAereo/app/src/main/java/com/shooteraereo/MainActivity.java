@@ -6,6 +6,8 @@ import android.util.DisplayMetrics;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.shooteraereo.gestores.GestorAudio;
+
 public class MainActivity extends Activity {
     GameView gameView = null;
 
@@ -38,5 +40,21 @@ public class MainActivity extends Activity {
             gameView.gameloop.setRunning(false);
             gameView = null;
         }
+    }
+
+    @Override
+    protected void onPause() {
+        if (GestorAudio.getInstancia() != null){
+            GestorAudio.getInstancia().pararMusicaAmbiente();
+        }
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        if (GestorAudio.getInstancia() != null){
+            GestorAudio.getInstancia().reproducirMusicaAmbiente();
+        }
+        super.onResume();
     }
 }

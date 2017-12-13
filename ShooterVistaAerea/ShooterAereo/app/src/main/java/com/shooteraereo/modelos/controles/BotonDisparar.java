@@ -31,7 +31,7 @@ public class BotonDisparar extends Modelo {
 
         if(distancia < 35){
             estaPulsado = true;
-            System.out.println("disaparo pulsado");
+            System.out.println("boton disparo pulsado");
         }
         return estaPulsado;
     }
